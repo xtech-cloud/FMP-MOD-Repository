@@ -1,0 +1,107 @@
+@page "/xtc/repository/plugin"
+
+<Card>
+    <Form @ref="searchForm"
+          Loading="searchLoading"
+          Model="searchFormData"
+          OnFinish="@onSearchSubmit">
+        <Row Gutter="24">
+            @for (var i = 0; i < (searchExpand ? searchFormData.Count : (searchFormData.Count < 3 ? searchFormData.Count : 3)); i++)
+            {
+                var index = i;
+                <GridCol Span="8" @key="index">
+                    <FormItem Label="@(context[index].Text)">
+                        <Input @bind-Value="@(context[index].Value)" Placeholder="请输入" />
+                    </FormItem>
+                </GridCol>
+            }
+        </Row>
+        <Row>
+            <GridCol Span="24" Style="text-align:right;">
+                <Button Type="primary" HtmlType="submit">查询</Button>
+                <Button Style="margin: 0 8px;" OnClick="@onSearchResetClick">重置</Button>
+                <!--
+                <a style="font-size:12px" onclick="()=>{}">
+                    <Icon Type="@(searchExpand?"up":"down")"></Icon>  Collapse
+                </a>
+                -->
+            </GridCol>
+        </Row>
+    </Form>
+</Card>
+
+<Card Style="margin-top:24px">
+    <div style="display:flex; margin-bottom:24px;">
+        <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Plus" OnClick="@onCreateClick">创建</Button>
+    </div>
+    <Table TItem="TableModel" DataSource="@tableModel" Total="@tableTotal" PageIndex="tablePageIndex" PageSize="tablePageSize" OnPageIndexChange="onPageIndexChanged">
+        <Column @bind-Field="@context.Name"></Column>
+        <Column @bind-Field="@context.Version"></Column>
+        <Column @bind-Field="@context.Size"></Column>
+        <Column @bind-Field="@context.Hash"></Column>
+        <Column @bind-Field="@context.UpdatedAt"></Column>
+        <ActionColumn Title="操作" Fixed="right" Width="150">
+            <Space Size=@("middle")>
+                <SpaceItem>
+                    <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)">上传</Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Popconfirm Title="确定要删除这个插件吗?"
+                                OnConfirm="@(()=>onConfirmDelete(context.Uuid))"
+                                OnCancel="onCancelDelete"
+                                OkText="确定"
+                                CancelText="取消">
+                        <Button Size="small">删除</Button>
+                    </Popconfirm>
+                </SpaceItem>
+            </Space>
+        </ActionColumn>
+    </Table>
+</Card>
+
+<Modal Title="创建插件"
+       Visible="@visibleCreateModal"
+       ConfirmLoading="@createLoading"
+       OnOk="@onCreateModalOk"
+       OnCancel="@onCreateModalCancel">
+    <Form Model="@createModel"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+          OnFinish="onCreateSubmit"
+          @ref="@createForm">
+        <FormItem Label="名称">
+            <Input @bind-Value="@context.Name" />
+        </FormItem>
+        <FormItem Label="版本号">
+            <Input @bind-Value="@context.Version" />
+        </FormItem>
+    </Form>
+</Modal>
+
+<Modal Title="上传插件"
+       Visible="@visibleUploadModal"
+       OnOk="@onUploadModalCancel"
+       OnCancel="@onUploadModalCancel">
+    <Upload Action="@uploadUrl"
+            Method="put"
+            Accept=".dll"
+            ShowUploadList="false"
+            OnChange="@onUploadChange"
+            OnSingleCompleted="@onUploadCompleted">
+        <Button Icon="upload">
+            <span>Upload</span>
+        </Button>
+    </Upload>
+    <Progress Percent=@uploadPercent ShowInfo="false" />
+</Modal>
+
+
+<style>
+    .card-search-col {
+        margin-right: 64px;
+        margin-bottom: 24px;
+    }
+</style>
+
+@code {
+}

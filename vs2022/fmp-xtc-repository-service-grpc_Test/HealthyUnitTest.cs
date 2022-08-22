@@ -12,8 +12,9 @@ public class HealthyTest : HealthyUnitTestBase
     public override async Task EchoTest()
     {
         var request = new HealthyEchoRequest();
+        request.Msg = "hello";
         var response = await fixture_.getServiceHealthy().Echo(request, fixture_.context);
-        Assert.Equal(0, response.Status.Code);
+        Assert.Equal(request.Msg, response.Msg);
     }
 
 }

@@ -23,5 +23,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
             yourDAO_ = _yourDAO;
         }
         */
+
+        protected override async Task<HealthyEchoResponse> safeEcho(HealthyEchoRequest _request, ServerCallContext _context)
+        {
+            return await Task.Run(() => new HealthyEchoResponse
+            {
+                Status = new LIB.Proto.Status(),
+                Msg = _request.Msg,
+            });
+        }
     }
 }

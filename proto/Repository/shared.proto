@@ -47,3 +47,13 @@ message UuidResponse
     Status status = 1;  // 状态
     string uuid = 2;  // 唯一识别码
 }
+
+message PluginEntity
+{
+    string uuid = 1;  // 唯一识别码
+    string name = 2;  // 名称
+    string version = 3;  // 版本号
+    uint64 size = 4;  // 文件大小
+    string hash = 5;  // 文件哈希值
+    int64 updatedAt = 10;  // 更新时间
+}

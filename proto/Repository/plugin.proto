@@ -1,0 +1,75 @@
+
+syntax = "proto3";
+import "shared.proto";
+
+option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
+package xtc.fmp.repository;
+
+// 插件
+service Plugin {
+    // 创建
+    rpc Create(PluginCreateRequest) returns (UuidResponse) {}
+    // 更新
+    rpc Update(PluginUpdateRequest) returns (UuidResponse) {}
+    // 读取
+    rpc Retrieve(UuidRequest) returns (PluginRetrieveResponse) {}
+    // 删除
+    rpc Delete(UuidRequest) returns (UuidResponse) {}
+    // 列举
+    rpc List(PluginListRequest) returns (PluginListResponse) {}
+    // 搜索
+    rpc Search(PluginSearchRequest) returns (PluginListResponse) {}
+    // 准备上传
+    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
+    // 完成上传
+    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+}
+
+// 创建的请求
+message PluginCreateRequest {
+    string name = 1;  // 名称
+    string version = 2;  // 版本号 
+}
+
+// 更新的请求
+message PluginUpdateRequest {
+    string uuid = 1;  // 唯一识别码
+}
+
+// 读取的回复
+message PluginRetrieveResponse {
+    Status status = 1;  // 状态
+    PluginEntity plugin = 2;  // plugin实体
+}
+
+// 列举的请求
+message PluginListRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+}
+
+// 列举的回复
+message PluginListResponse {
+    Status status = 1;  // 状态
+    int64 total = 2;  // 总数
+    repeated PluginEntity plugins = 3;  //  plugin实体列表
+}
+
+// 搜索的请求
+message PluginSearchRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+    string name = 3;  // 名称
+}
+
+// 准备上传的回复
+message PrepareUploadResponse {
+    Status status = 1;  // 状态
+    string url = 2;  // 上传地址
+}
+
+// 完成上传的回复
+message FlushUploadResponse {
+    Status status = 1;  // 状态
+    string url = 2; // 下载地址
+}

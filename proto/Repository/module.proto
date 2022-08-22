@@ -1,0 +1,10 @@
+
+syntax = "proto3";
+import "shared.proto";
+
+option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
+package xtc.fmp.repository;
+
+// 模块
+service Module {
+}
