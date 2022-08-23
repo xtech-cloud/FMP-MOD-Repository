@@ -11,13 +11,13 @@ using XTC.FMP.MOD.Repository.LIB.Proto;
 namespace XTC.FMP.MOD.Repository.App.Service
 {
     /// <summary>
-    /// Plugin基类
+    /// Module基类
     /// </summary>
-    public class PluginServiceBase : LIB.Proto.Plugin.PluginBase
+    public class ModuleServiceBase : LIB.Proto.Module.ModuleBase
     {
     
 
-        public override async Task<UuidResponse> Create(PluginCreateRequest _request, ServerCallContext _context)
+        public override async Task<UuidResponse> Create(ModuleCreateRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
         }
 
-        public override async Task<UuidResponse> Update(PluginUpdateRequest _request, ServerCallContext _context)
+        public override async Task<UuidResponse> Update(ModuleUpdateRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
         }
 
-        public override async Task<PluginRetrieveResponse> Retrieve(UuidRequest _request, ServerCallContext _context)
+        public override async Task<ModuleRetrieveResponse> Retrieve(UuidRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -69,14 +69,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
             catch (ArgumentRequiredException ex)
             {
-                return await Task.Run(() => new PluginRetrieveResponse
+                return await Task.Run(() => new ModuleRetrieveResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.BadRequest.GetHashCode(), Message = ex.Message },
                 });
             }
             catch (Exception ex)
             {
-                return await Task.Run(() => new PluginRetrieveResponse
+                return await Task.Run(() => new ModuleRetrieveResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.InternalServerError.GetHashCode(), Message = ex.Message },
                 });
@@ -105,7 +105,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
         }
 
-        public override async Task<PluginListResponse> List(PluginListRequest _request, ServerCallContext _context)
+        public override async Task<ModuleListResponse> List(ModuleListRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -113,21 +113,21 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
             catch (ArgumentRequiredException ex)
             {
-                return await Task.Run(() => new PluginListResponse
+                return await Task.Run(() => new ModuleListResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.BadRequest.GetHashCode(), Message = ex.Message },
                 });
             }
             catch (Exception ex)
             {
-                return await Task.Run(() => new PluginListResponse
+                return await Task.Run(() => new ModuleListResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.InternalServerError.GetHashCode(), Message = ex.Message },
                 });
             }
         }
 
-        public override async Task<PluginListResponse> Search(PluginSearchRequest _request, ServerCallContext _context)
+        public override async Task<ModuleListResponse> Search(ModuleSearchRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -135,14 +135,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
             catch (ArgumentRequiredException ex)
             {
-                return await Task.Run(() => new PluginListResponse
+                return await Task.Run(() => new ModuleListResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.BadRequest.GetHashCode(), Message = ex.Message },
                 });
             }
             catch (Exception ex)
             {
-                return await Task.Run(() => new PluginListResponse
+                return await Task.Run(() => new ModuleListResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.InternalServerError.GetHashCode(), Message = ex.Message },
                 });
@@ -239,23 +239,23 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
 
 
-        protected virtual async Task<UuidResponse> safeCreate(PluginCreateRequest _request, ServerCallContext _context)
+        protected virtual async Task<UuidResponse> safeCreate(ModuleCreateRequest _request, ServerCallContext _context)
         {
             return await Task.Run(() => new UuidResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }
 
-        protected virtual async Task<UuidResponse> safeUpdate(PluginUpdateRequest _request, ServerCallContext _context)
+        protected virtual async Task<UuidResponse> safeUpdate(ModuleUpdateRequest _request, ServerCallContext _context)
         {
             return await Task.Run(() => new UuidResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }
 
-        protected virtual async Task<PluginRetrieveResponse> safeRetrieve(UuidRequest _request, ServerCallContext _context)
+        protected virtual async Task<ModuleRetrieveResponse> safeRetrieve(UuidRequest _request, ServerCallContext _context)
         {
-            return await Task.Run(() => new PluginRetrieveResponse {
+            return await Task.Run(() => new ModuleRetrieveResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }
@@ -267,16 +267,16 @@ namespace XTC.FMP.MOD.Repository.App.Service
             });
         }
 
-        protected virtual async Task<PluginListResponse> safeList(PluginListRequest _request, ServerCallContext _context)
+        protected virtual async Task<ModuleListResponse> safeList(ModuleListRequest _request, ServerCallContext _context)
         {
-            return await Task.Run(() => new PluginListResponse {
+            return await Task.Run(() => new ModuleListResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }
 
-        protected virtual async Task<PluginListResponse> safeSearch(PluginSearchRequest _request, ServerCallContext _context)
+        protected virtual async Task<ModuleListResponse> safeSearch(ModuleSearchRequest _request, ServerCallContext _context)
         {
-            return await Task.Run(() => new PluginListResponse {
+            return await Task.Run(() => new ModuleListResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }

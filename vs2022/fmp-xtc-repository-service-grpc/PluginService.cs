@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using XTC.FMP.MOD.Repository.LIB.Proto;
+using XTC.FMP.MOD.Repository.LIB.MVCS;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
@@ -49,6 +50,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             plugin.Name = _request.Name;
             plugin.Version = _request.Version;
             plugin.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
+            plugin.Flags = 0;
             await pluginDAO_.CreateAsync(plugin);
             return await Task.Run(() => new UuidResponse
             {
@@ -77,9 +79,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
                     Uuid = plugin.Uuid.ToString(),
                     Name = plugin.Name,
                     Version = plugin.Version,
-                    Size = plugin.Size,
-                    Hash = plugin.Hash ?? "",
+                    Flags = plugin.Flags,
                     UpdatedAt = plugin.UpdatedAt,
+                    File = new FileEntity()
+                    {
+                        Name = plugin.Name + ".dll",
+                        Size = plugin.Size,
+                        Hash = plugin.Hash ?? "",
+                    },
                 }
             };
         }
@@ -102,9 +109,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
                     Uuid = plugin.Uuid.ToString(),
                     Name = plugin.Name,
                     Version = plugin.Version,
-                    Size = plugin.Size,
-                    Hash = plugin.Hash ?? "",
+                    Flags = plugin.Flags,
                     UpdatedAt = plugin.UpdatedAt,
+                    File = new FileEntity()
+                    {
+                        Name = plugin.Name + ".dll",
+                        Size = plugin.Size,
+                        Hash = plugin.Hash ?? "",
+                    },
                 });
             }
             return response;
@@ -124,9 +136,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
                     Uuid = plugin.Uuid.ToString(),
                     Name = plugin.Name,
                     Version = plugin.Version,
-                    Size = plugin.Size,
-                    Hash = plugin.Hash ?? "",
+                    Flags = plugin.Flags,
                     UpdatedAt = plugin.UpdatedAt,
+                    File = new FileEntity()
+                    {
+                        Name = plugin.Name + ".dll",
+                        Size = plugin.Size,
+                        Hash = plugin.Hash ?? "",
+                    },
                 });
             }
             return response;
@@ -155,6 +172,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
             {
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
+
+            if(Flags.HasFlag(plugin.Flags, Flags.LOCK))
+            {
+                return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 2, Message = "Locked" } };
+            }
+
             string path = string.Format("plugins/{0}@{1}.dll", plugin.Name, plugin.Version);
             // 有效期1小时
             string url = await minioClient_.PresignedPutObject(path, 60 * 60);
@@ -179,11 +202,48 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var result = await minioClient_.StateObject(path);
             plugin.Hash = result.Key;
             plugin.Size = result.Value;
+            plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
             await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
             return new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
                 Url = "",
+            };
+        }
+
+        protected override async Task<UuidResponse> safeAddFlag(FlagOperationRequest _request, ServerCallContext _context)
+        {
+            ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
+
+            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            if (null == plugin)
+            {
+                return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
+            }
+            plugin.Flags = Flags.AddFlag(plugin.Flags, _request.Flag);
+            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            return new UuidResponse()
+            {
+                Status = new LIB.Proto.Status(),
+                Uuid = _request.Uuid,
+            };
+        }
+
+        protected override async Task<UuidResponse> safeRemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
+        {
+            ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
+
+            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            if (null == plugin)
+            {
+                return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
+            }
+            plugin.Flags = Flags.RemoveFlag(plugin.Flags, _request.Flag);
+            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            return new UuidResponse()
+            {
+                Status = new LIB.Proto.Status(),
+                Uuid = _request.Uuid,
             };
         }
     }

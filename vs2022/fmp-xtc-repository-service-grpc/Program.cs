@@ -39,6 +39,8 @@ app.UseGrpcWeb();
 
 app.MapGrpcService<HealthyService>().EnableGrpcWeb();
 
+app.MapGrpcService<ModuleService>().EnableGrpcWeb();
+
 app.MapGrpcService<PluginService>().EnableGrpcWeb();
 
 

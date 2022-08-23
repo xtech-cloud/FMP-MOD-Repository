@@ -23,6 +23,10 @@ service Plugin {
     rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
     // 完成上传
     rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+    // 添加标志
+    rpc AddFlag(FlagOperationRequest) returns (UuidResponse) {}
+    // 移除标志
+    rpc RemoveFlag(FlagOperationRequest) returns (UuidResponse) {}
 }
 
 // 创建的请求
@@ -60,16 +64,4 @@ message PluginSearchRequest {
     int64 offset = 1;  // 偏移值
     int64 count = 2;  // 数量
     string name = 3;  // 名称
-}
-
-// 准备上传的回复
-message PrepareUploadResponse {
-    Status status = 1;  // 状态
-    string url = 2;  // 上传地址
-}
-
-// 完成上传的回复
-message FlushUploadResponse {
-    Status status = 1;  // 状态
-    string url = 2; // 下载地址
 }

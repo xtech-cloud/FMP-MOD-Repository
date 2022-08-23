@@ -43,6 +43,25 @@ public abstract class TestFixtureBase : IDisposable
     /// </example>
     protected abstract void newHealthyService();
 
+    protected ModuleService? serviceModule_ { get; set; }
+
+    public ModuleService getServiceModule()
+    {
+        if(null == serviceModule_)
+        {
+            newModuleService();
+        }
+        return serviceModule_!;
+    }
+
+    /// <summary>
+    /// 实例化服务
+    /// </summary>
+    /// <example>
+    /// serviceModule_ = new ModuleService(new ModuleDAO(new DatabaseOptions()));
+    /// </example>
+    protected abstract void newModuleService();
+
     protected PluginService? servicePlugin_ { get; set; }
 
     public PluginService getServicePlugin()

@@ -1,4 +1,4 @@
-
+﻿
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\fmp-xtc-repository-lib-proto\fmp-xtc-repository-lib-proto.csproj" />
+    <ProjectReference Include="..\fmp-xtc-repository-lib-mvcs\fmp-xtc-repository-lib-mvcs.csproj" />
   </ItemGroup>
 
 </Project>

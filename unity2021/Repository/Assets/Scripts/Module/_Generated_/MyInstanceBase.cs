@@ -26,6 +26,8 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
 
         public IHealthyViewBridge viewBridgeHealthy { get; set; }
 
+        public IModuleViewBridge viewBridgeModule { get; set; }
+
         public IPluginViewBridge viewBridgePlugin { get; set; }
 
 
@@ -75,6 +77,12 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
             bridgeHealthy.logger = logger_;
             facadeHealthy.setUiBridge(bridgeHealthy);
             viewBridgeHealthy = facadeHealthy.getViewBridge() as IHealthyViewBridge;
+
+            var facadeModule = entry_.getDynamicModuleFacade(uid);
+            var bridgeModule = new ModuleUiBridge();
+            bridgeModule.logger = logger_;
+            facadeModule.setUiBridge(bridgeModule);
+            viewBridgeModule = facadeModule.getViewBridge() as IModuleViewBridge;
 
             var facadePlugin = entry_.getDynamicPluginFacade(uid);
             var bridgePlugin = new PluginUiBridge();
@@ -198,6 +206,216 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
                 try
                 {
                     var reslut = await viewBridgeHealthy.OnEchoSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleCreate(ModuleCreateRequest _request)
+        {
+            var dto = new ModuleCreateRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnCreateSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleUpdate(ModuleUpdateRequest _request)
+        {
+            var dto = new ModuleUpdateRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnUpdateSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleRetrieve(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnRetrieveSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleDelete(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnDeleteSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleList(ModuleListRequest _request)
+        {
+            var dto = new ModuleListRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnListSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleSearch(ModuleSearchRequest _request)
+        {
+            var dto = new ModuleSearchRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnSearchSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModulePrepareUpload(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnPrepareUploadSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleFlushUpload(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnFlushUploadSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleAddFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnAddFlagSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitModuleRemoveFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeModule.OnRemoveFlagSubmit(dto, context);
                     if (!LibMVCS.Error.IsOK(reslut))
                     {
                         logger_.Error(reslut.getMessage());
@@ -366,6 +584,48 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
                 try
                 {
                     var reslut = await viewBridgePlugin.OnFlushUploadSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitPluginAddFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgePlugin.OnAddFlagSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitPluginRemoveFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgePlugin.OnRemoveFlagSubmit(dto, context);
                     if (!LibMVCS.Error.IsOK(reslut))
                     {
                         logger_.Error(reslut.getMessage());

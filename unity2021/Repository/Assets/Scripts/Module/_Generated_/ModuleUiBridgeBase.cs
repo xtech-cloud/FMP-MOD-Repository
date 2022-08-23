@@ -11,7 +11,7 @@ using XTC.FMP.MOD.Repository.LIB.Bridge;
 namespace XTC.FMP.MOD.Repository.LIB.Unity
 {
 
-    public class PluginUiBridgeBase : IPluginUiBridge
+    public class ModuleUiBridgeBase : IModuleUiBridge
     {
         public LibMVCS.Logger logger { get; set; }
 

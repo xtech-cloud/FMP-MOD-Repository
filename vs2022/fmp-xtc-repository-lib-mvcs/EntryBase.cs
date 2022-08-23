@@ -86,6 +86,44 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             return facade;
         }
 
+        protected Dictionary<string, ModuleFacade?> facadeModuleStaticMap_ = new Dictionary<string, ModuleFacade?>();
+        protected Dictionary<string, ModuleModel?> modelModuleStaticMap_ = new Dictionary<string, ModuleModel?>();
+        protected Dictionary<string, ModuleView?> viewModuleStaticMap_ = new Dictionary<string, ModuleView?>();
+        protected Dictionary<string, ModuleController?> controllerModuleStaticMap_ = new Dictionary<string, ModuleController?>();
+        protected Dictionary<string, ModuleService?> serviceModuleStaticMap_ = new Dictionary<string, ModuleService?>();
+
+        protected Dictionary<string, ModuleFacade?> facadeModuleDynamicMap_ = new Dictionary<string, ModuleFacade?>();
+        protected Dictionary<string, ModuleModel?> modelModuleDynamicMap_ = new Dictionary<string, ModuleModel?>();
+        protected Dictionary<string, ModuleView?> viewModuleDynamicMap_ = new Dictionary<string, ModuleView?>();
+        protected Dictionary<string, ModuleController?> controllerModuleDynamicMap_ = new Dictionary<string, ModuleController?>();
+        protected Dictionary<string, ModuleService?> serviceModuleDynamicMap_ = new Dictionary<string, ModuleService?>();
+
+        /// <summary>
+        /// 获取Module的UI装饰层
+        /// </summary>
+        /// <param name="_gid">直系的组的ID</param>
+        /// <returns>UI装饰层</returns>
+        public ModuleFacade? getStaticModuleFacade(string _gid)
+        {
+            ModuleFacade? facade = null;
+            if (!facadeModuleStaticMap_.TryGetValue(ModuleFacade.NAME + "." + _gid, out facade))
+                return null;
+            return facade;
+        }
+
+        /// <summary>
+        /// 获取Module的UI装饰层
+        /// </summary>
+        /// <param name="_gid">直系的组的ID</param>
+        /// <returns>UI装饰层</returns>
+        public ModuleFacade? getDynamicModuleFacade(string _gid)
+        {
+            ModuleFacade? facade = null;
+            if (!facadeModuleDynamicMap_.TryGetValue(ModuleFacade.NAME + "." + _gid, out facade))
+                return null;
+            return facade;
+        }
+
         protected Dictionary<string, PluginFacade?> facadePluginStaticMap_ = new Dictionary<string, PluginFacade?>();
         protected Dictionary<string, PluginModel?> modelPluginStaticMap_ = new Dictionary<string, PluginModel?>();
         protected Dictionary<string, PluginView?> viewPluginStaticMap_ = new Dictionary<string, PluginView?>();
@@ -177,6 +215,31 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             framework_.getStaticPipe().RegisterFacade(facadeHealthy);
 
             // 注册数据层
+            var modelModule = new ModuleModel(ModuleModel.NAME + "." + _gid, _gid);
+            modelModuleStaticMap_[ModuleModel.NAME + "." + _gid] = modelModule;
+            framework_.getStaticPipe().RegisterModel(modelModule);
+            // 注册视图层
+            var viewModule = new ModuleView(ModuleView.NAME + "." + _gid, _gid);
+            viewModuleStaticMap_[ModuleView.NAME + "." + _gid] = viewModule;
+            framework_.getStaticPipe().RegisterView(viewModule);
+            // 注册控制层
+            var controllerModule = new ModuleController(ModuleController.NAME + "." + _gid, _gid);
+            controllerModuleStaticMap_[ModuleController.NAME + "." + _gid] = controllerModule;
+            framework_.getStaticPipe().RegisterController(controllerModule);
+            // 注册服务层
+            var serviceModule = new ModuleService(ModuleService.NAME + "." + _gid, _gid);
+            serviceModuleStaticMap_[ModuleService.NAME + "." + _gid] = serviceModule;
+            framework_.getStaticPipe().RegisterService(serviceModule);
+            serviceModule.InjectGrpcChannel(options_?.getChannel());
+            // 注册UI装饰层
+            var facadeModule = new ModuleFacade(ModuleFacade.NAME + "." + _gid, _gid);
+            facadeModuleStaticMap_[ModuleFacade.NAME + "." + _gid] = facadeModule;
+            var bridgeModule = new ModuleViewBridge();
+            bridgeModule.service = serviceModule;
+            facadeModule.setViewBridge(bridgeModule);
+            framework_.getStaticPipe().RegisterFacade(facadeModule);
+
+            // 注册数据层
             var modelPlugin = new PluginModel(PluginModel.NAME + "." + _gid, _gid);
             modelPluginStaticMap_[PluginModel.NAME + "." + _gid] = modelPlugin;
             framework_.getStaticPipe().RegisterModel(modelPlugin);
@@ -243,6 +306,31 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             bridgeHealthy.service = serviceHealthy;
             facadeHealthy.setViewBridge(bridgeHealthy);
             framework_.getDynamicPipe().PushFacade(facadeHealthy);
+
+            // 注册数据层
+            var modelModule = new ModuleModel(ModuleModel.NAME + "." + _gid, _gid);
+            modelModuleDynamicMap_[ModuleModel.NAME + "." + _gid] = modelModule;
+            framework_.getDynamicPipe().PushModel(modelModule);
+            // 注册视图层
+            var viewModule = new ModuleView(ModuleView.NAME + "." + _gid, _gid);
+            viewModuleDynamicMap_[ModuleView.NAME + "." + _gid] = viewModule;
+            framework_.getDynamicPipe().PushView(viewModule);
+            // 注册控制层
+            var controllerModule = new ModuleController(ModuleController.NAME + "." + _gid, _gid);
+            controllerModuleDynamicMap_[ModuleController.NAME + "." + _gid] = controllerModule;
+            framework_.getDynamicPipe().PushController(controllerModule);
+            // 注册服务层
+            var serviceModule = new ModuleService(ModuleService.NAME + "." + _gid, _gid);
+            serviceModuleDynamicMap_[ModuleService.NAME + "." + _gid] = serviceModule;
+            framework_.getDynamicPipe().PushService(serviceModule);
+            serviceModule.InjectGrpcChannel(options_?.getChannel());
+            // 注册UI装饰层
+            var facadeModule = new ModuleFacade(ModuleFacade.NAME + "." + _gid, _gid);
+            facadeModuleDynamicMap_[ModuleFacade.NAME + "." + _gid] = facadeModule;
+            var bridgeModule = new ModuleViewBridge();
+            bridgeModule.service = serviceModule;
+            facadeModule.setViewBridge(bridgeModule);
+            framework_.getDynamicPipe().PushFacade(facadeModule);
 
             // 注册数据层
             var modelPlugin = new PluginModel(PluginModel.NAME + "." + _gid, _gid);
@@ -321,6 +409,42 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             {
                 framework_.getStaticPipe().CancelModel(modelHealthy);
                 modelHealthyStaticMap_.Remove(HealthyModel.NAME + "." +_gid);
+            }
+
+            // 注销服务层
+            ModuleService? serviceModule;
+            if(serviceModuleStaticMap_.TryGetValue(ModuleService.NAME + "." + _gid, out serviceModule))
+            {
+                framework_.getStaticPipe().CancelService(serviceModule);
+                serviceModuleStaticMap_.Remove(ModuleService.NAME + "." +_gid);
+            }
+            // 注销控制层
+            ModuleController? controllerModule;
+            if(controllerModuleStaticMap_.TryGetValue(ModuleController.NAME + "." + _gid, out controllerModule))
+            {
+                framework_.getStaticPipe().CancelController(controllerModule);
+                controllerModuleStaticMap_.Remove(ModuleController.NAME + "." +_gid);
+            }
+            // 注销视图层
+            ModuleView? viewModule;
+            if(viewModuleStaticMap_.TryGetValue(ModuleView.NAME + "." + _gid, out viewModule))
+            {
+                framework_.getStaticPipe().CancelView(viewModule);
+                viewModuleStaticMap_.Remove(ModuleView.NAME + "." +_gid);
+            }
+            // 注销UI装饰层
+            ModuleFacade? facadeModule;
+            if(facadeModuleStaticMap_.TryGetValue(ModuleFacade.NAME + "." + _gid, out facadeModule))
+            {
+                framework_.getStaticPipe().CancelFacade(facadeModule);
+                facadeModuleStaticMap_.Remove(ModuleFacade.NAME + "." +_gid);
+            }
+            // 注销数据层
+            ModuleModel? modelModule;
+            if(modelModuleStaticMap_.TryGetValue(ModuleModel.NAME + "." + _gid, out modelModule))
+            {
+                framework_.getStaticPipe().CancelModel(modelModule);
+                modelModuleStaticMap_.Remove(ModuleModel.NAME + "." +_gid);
             }
 
             // 注销服务层
@@ -411,6 +535,42 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             {
                 framework_.getDynamicPipe().PopModel(modelHealthy);
                 modelHealthyDynamicMap_.Remove(HealthyModel.NAME + "." +_gid);
+            }
+
+            // 注销服务层
+            ModuleService? serviceModule;
+            if(serviceModuleDynamicMap_.TryGetValue(ModuleService.NAME + "." + _gid, out serviceModule))
+            {
+                framework_.getDynamicPipe().PopService(serviceModule);
+                serviceModuleDynamicMap_.Remove(ModuleService.NAME + "." +_gid);
+            }
+            // 注销控制层
+            ModuleController? controllerModule;
+            if(controllerModuleDynamicMap_.TryGetValue(ModuleController.NAME + "." + _gid, out controllerModule))
+            {
+                framework_.getDynamicPipe().PopController(controllerModule);
+                controllerModuleDynamicMap_.Remove(ModuleController.NAME + "." +_gid);
+            }
+            // 注销视图层
+            ModuleView? viewModule;
+            if(viewModuleDynamicMap_.TryGetValue(ModuleView.NAME + "." + _gid, out viewModule))
+            {
+                framework_.getDynamicPipe().PopView(viewModule);
+                viewModuleDynamicMap_.Remove(ModuleView.NAME + "." +_gid);
+            }
+            // 注销UI装饰层
+            ModuleFacade? facadeModule;
+            if(facadeModuleDynamicMap_.TryGetValue(ModuleFacade.NAME + "." + _gid, out facadeModule))
+            {
+                framework_.getDynamicPipe().PopFacade(facadeModule);
+                facadeModuleDynamicMap_.Remove(ModuleFacade.NAME + "." +_gid);
+            }
+            // 注销数据层
+            ModuleModel? modelModule;
+            if(modelModuleDynamicMap_.TryGetValue(ModuleModel.NAME + "." + _gid, out modelModule))
+            {
+                framework_.getDynamicPipe().PopModel(modelModule);
+                modelModuleDynamicMap_.Remove(ModuleModel.NAME + "." +_gid);
             }
 
             // 注销服务层

@@ -11,26 +11,26 @@ using XTC.FMP.MOD.Repository.LIB.Bridge;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     /// <summary>
-    /// Plugin的视图桥接层基类（协议部分）
+    /// Module的视图桥接层基类（协议部分）
     /// 处理UI的事件
     /// </summary>
-    public class PluginViewBridgeBase : IPluginViewBridge
+    public class ModuleViewBridgeBase : IModuleViewBridge
     {
 
         /// <summary>
         /// 直系服务层
         /// </summary>
-        public PluginService? service { get; set; }
+        public ModuleService? service { get; set; }
 
 
         /// <summary>
         /// 处理Create的提交
         /// </summary>
-        /// <param name="_dto">PluginCreateRequest的数据传输对象</param>
+        /// <param name="_dto">ModuleCreateRequest的数据传输对象</param>
         /// <returns>错误</returns>
         public virtual async Task<Error> OnCreateSubmit(IDTO _dto, SynchronizationContext? _context)
         {
-            PluginCreateRequestDTO? dto = _dto as PluginCreateRequestDTO;
+            ModuleCreateRequestDTO? dto = _dto as ModuleCreateRequestDTO;
             if(null == service)
             {
                 return Error.NewNullErr("service is null");
@@ -41,11 +41,11 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 处理Update的提交
         /// </summary>
-        /// <param name="_dto">PluginUpdateRequest的数据传输对象</param>
+        /// <param name="_dto">ModuleUpdateRequest的数据传输对象</param>
         /// <returns>错误</returns>
         public virtual async Task<Error> OnUpdateSubmit(IDTO _dto, SynchronizationContext? _context)
         {
-            PluginUpdateRequestDTO? dto = _dto as PluginUpdateRequestDTO;
+            ModuleUpdateRequestDTO? dto = _dto as ModuleUpdateRequestDTO;
             if(null == service)
             {
                 return Error.NewNullErr("service is null");
@@ -86,11 +86,11 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 处理List的提交
         /// </summary>
-        /// <param name="_dto">PluginListRequest的数据传输对象</param>
+        /// <param name="_dto">ModuleListRequest的数据传输对象</param>
         /// <returns>错误</returns>
         public virtual async Task<Error> OnListSubmit(IDTO _dto, SynchronizationContext? _context)
         {
-            PluginListRequestDTO? dto = _dto as PluginListRequestDTO;
+            ModuleListRequestDTO? dto = _dto as ModuleListRequestDTO;
             if(null == service)
             {
                 return Error.NewNullErr("service is null");
@@ -101,11 +101,11 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 处理Search的提交
         /// </summary>
-        /// <param name="_dto">PluginSearchRequest的数据传输对象</param>
+        /// <param name="_dto">ModuleSearchRequest的数据传输对象</param>
         /// <returns>错误</returns>
         public virtual async Task<Error> OnSearchSubmit(IDTO _dto, SynchronizationContext? _context)
         {
-            PluginSearchRequestDTO? dto = _dto as PluginSearchRequestDTO;
+            ModuleSearchRequestDTO? dto = _dto as ModuleSearchRequestDTO;
             if(null == service)
             {
                 return Error.NewNullErr("service is null");

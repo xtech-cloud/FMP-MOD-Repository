@@ -1,5 +1,7 @@
 @page "/xtc/repository/plugin"
 
+@using System.ComponentModel
+
 <Card>
     <Form @ref="searchForm"
           Loading="searchLoading"
@@ -40,8 +42,20 @@
         <Column @bind-Field="@context.Size"></Column>
         <Column @bind-Field="@context.Hash"></Column>
         <Column @bind-Field="@context.UpdatedAt"></Column>
+        <ActionColumn Title="锁定" Width="80">
+            <Switch Checked="@context._Locked" Disabled="true"></Switch>
+        </ActionColumn>
         <ActionColumn Title="操作" Fixed="right" Width="150">
             <Space Size=@("middle")>
+                <SpaceItem>
+                    <Popconfirm Title="确定要解锁这个插件吗?"
+                                OnConfirm="@(()=>onConfirmUnlock(context.Uuid))"
+                                OnCancel="onCancelUnlock"
+                                OkText="确定"
+                                CancelText="取消">
+                        <Button Size="small">解锁</Button>
+                    </Popconfirm>
+                </SpaceItem>
                 <SpaceItem>
                     <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)">上传</Button>
                 </SpaceItem>
@@ -51,7 +65,7 @@
                                 OnCancel="onCancelDelete"
                                 OkText="确定"
                                 CancelText="取消">
-                        <Button Size="small">删除</Button>
+                        <Button Danger Size="small">删除</Button>
                     </Popconfirm>
                 </SpaceItem>
             </Space>

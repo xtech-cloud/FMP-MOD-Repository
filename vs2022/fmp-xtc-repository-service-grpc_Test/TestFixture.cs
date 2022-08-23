@@ -22,6 +22,11 @@ public class TestFixture : TestFixtureBase
         serviceHealthy_ = new HealthyService();
     }
 
+    protected override void newModuleService()
+    {
+        throw new NotImplementedException();
+    }
+
     protected override void newPluginService()
     {
         servicePlugin_ = new PluginService(new PluginDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));

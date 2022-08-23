@@ -10,16 +10,16 @@ using XTC.FMP.MOD.Repository.LIB.Bridge;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     /// <summary>
-    /// Plugin视图层基类
+    /// Module视图层基类
     /// </summary>
-    public class PluginViewBase : View
+    public class ModuleViewBase : View
     {
         /// <summary>
         /// 带uid参数的构造函数
         /// </summary>
         /// <param name="_uid">实例化后的唯一识别码</param>
         /// <param name="_gid">直系的组的ID</param>
-        public PluginViewBase(string _uid, string _gid) : base(_uid)
+        public ModuleViewBase(string _uid, string _gid) : base(_uid)
         {
             gid_ = _gid;
         }
@@ -32,7 +32,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">UuidResponse的数据传输对象</param>
         public virtual void RefreshProtoCreate(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_Create_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -48,7 +48,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">UuidResponse的数据传输对象</param>
         public virtual void RefreshProtoUpdate(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_Update_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -61,10 +61,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 刷新Retrieve的数据
         /// </summary>
         /// <param name="_err">错误</param>
-        /// <param name="_dto">PluginRetrieveResponse的数据传输对象</param>
-        public virtual void RefreshProtoRetrieve(Error _err, PluginRetrieveResponseDTO _dto, SynchronizationContext? _context)
+        /// <param name="_dto">ModuleRetrieveResponse的数据传输对象</param>
+        public virtual void RefreshProtoRetrieve(Error _err, ModuleRetrieveResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_Retrieve_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -80,7 +80,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">UuidResponse的数据传输对象</param>
         public virtual void RefreshProtoDelete(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_Delete_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -93,10 +93,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 刷新List的数据
         /// </summary>
         /// <param name="_err">错误</param>
-        /// <param name="_dto">PluginListResponse的数据传输对象</param>
-        public virtual void RefreshProtoList(Error _err, PluginListResponseDTO _dto, SynchronizationContext? _context)
+        /// <param name="_dto">ModuleListResponse的数据传输对象</param>
+        public virtual void RefreshProtoList(Error _err, ModuleListResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_List_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -109,10 +109,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 刷新Search的数据
         /// </summary>
         /// <param name="_err">错误</param>
-        /// <param name="_dto">PluginListResponse的数据传输对象</param>
-        public virtual void RefreshProtoSearch(Error _err, PluginListResponseDTO _dto, SynchronizationContext? _context)
+        /// <param name="_dto">ModuleListResponse的数据传输对象</param>
+        public virtual void RefreshProtoSearch(Error _err, ModuleListResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_Search_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -128,7 +128,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">PrepareUploadResponse的数据传输对象</param>
         public virtual void RefreshProtoPrepareUpload(Error _err, PrepareUploadResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_PrepareUpload_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -144,7 +144,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">FlushUploadResponse的数据传输对象</param>
         public virtual void RefreshProtoFlushUpload(Error _err, FlushUploadResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_FlushUpload_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -160,7 +160,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">UuidResponse的数据传输对象</param>
         public virtual void RefreshProtoAddFlag(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_AddFlag_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -176,7 +176,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_dto">UuidResponse的数据传输对象</param>
         public virtual void RefreshProtoRemoveFlag(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
         {
-            var bridge = getFacade()?.getUiBridge() as IPluginUiBridge; 
+            var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
             {
                 bridge?.Alert(string.Format("errcode_RemoveFlag_{0}", _err.getCode()), _err.getMessage(), _context);
@@ -190,10 +190,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取直系数据层
         /// </summary>
         /// <returns>数据层</returns>
-        protected PluginModel? getModel()
+        protected ModuleModel? getModel()
         {
             if(null == model_)
-                model_ = findModel(PluginModel.NAME + "." + gid_) as PluginModel;
+                model_ = findModel(ModuleModel.NAME + "." + gid_) as ModuleModel;
             return model_;
         }
 
@@ -201,10 +201,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取直系服务层
         /// </summary>
         /// <returns>服务层</returns>
-        protected PluginService? getService()
+        protected ModuleService? getService()
         {
             if(null == service_)
-                service_ = findService(PluginService.NAME + "." + gid_) as PluginService;
+                service_ = findService(ModuleService.NAME + "." + gid_) as ModuleService;
             return service_;
         }
 
@@ -212,10 +212,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取直系UI装饰层
         /// </summary>
         /// <returns>UI装饰层</returns>
-        protected PluginFacade? getFacade()
+        protected ModuleFacade? getFacade()
         {
             if(null == facade_)
-                facade_ = findFacade(PluginFacade.NAME + "." + gid_) as PluginFacade;
+                facade_ = findFacade(ModuleFacade.NAME + "." + gid_) as ModuleFacade;
             return facade_;
         }
 
@@ -227,17 +227,17 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 直系数据层
         /// </summary>
-        private PluginModel? model_;
+        private ModuleModel? model_;
 
         /// <summary>
         /// 直系服务层
         /// </summary>
-        private PluginService? service_;
+        private ModuleService? service_;
 
         /// <summary>
         /// 直系UI装饰层
         /// </summary>
-        private PluginFacade? facade_;
+        private ModuleFacade? facade_;
     }
 }
 

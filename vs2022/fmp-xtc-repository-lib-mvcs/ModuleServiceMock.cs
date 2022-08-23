@@ -9,23 +9,23 @@ using XTC.FMP.MOD.Repository.LIB.Proto;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     /// <summary>
-    /// Plugin服务模拟类
+    /// Module服务模拟类
     /// </summary>
-    public class PluginServiceMock
+    public class ModuleServiceMock
     {
 
 
-        public System.Func<PluginCreateRequest, Task<UuidResponse>>? CallCreateDelegate { get; set; } = null;
+        public System.Func<ModuleCreateRequest, Task<UuidResponse>>? CallCreateDelegate { get; set; } = null;
 
-        public System.Func<PluginUpdateRequest, Task<UuidResponse>>? CallUpdateDelegate { get; set; } = null;
+        public System.Func<ModuleUpdateRequest, Task<UuidResponse>>? CallUpdateDelegate { get; set; } = null;
 
-        public System.Func<UuidRequest, Task<PluginRetrieveResponse>>? CallRetrieveDelegate { get; set; } = null;
+        public System.Func<UuidRequest, Task<ModuleRetrieveResponse>>? CallRetrieveDelegate { get; set; } = null;
 
         public System.Func<UuidRequest, Task<UuidResponse>>? CallDeleteDelegate { get; set; } = null;
 
-        public System.Func<PluginListRequest, Task<PluginListResponse>>? CallListDelegate { get; set; } = null;
+        public System.Func<ModuleListRequest, Task<ModuleListResponse>>? CallListDelegate { get; set; } = null;
 
-        public System.Func<PluginSearchRequest, Task<PluginListResponse>>? CallSearchDelegate { get; set; } = null;
+        public System.Func<ModuleSearchRequest, Task<ModuleListResponse>>? CallSearchDelegate { get; set; } = null;
 
         public System.Func<UuidRequest, Task<PrepareUploadResponse>>? CallPrepareUploadDelegate { get; set; } = null;
 

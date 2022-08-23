@@ -12,18 +12,18 @@ using XTC.FMP.MOD.Repository.LIB.Proto;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     /// <summary>
-    /// Plugin服务层基类
+    /// Module服务层基类
     /// </summary>
-    public class PluginServiceBase : Service
+    public class ModuleServiceBase : Service
     {
-        public PluginServiceMock mock { get; set; } = new PluginServiceMock();
+        public ModuleServiceMock mock { get; set; } = new ModuleServiceMock();
     
         /// <summary>
         /// 带uid参数的构造函数
         /// </summary>
         /// <param name="_uid">实例化后的唯一识别码</param>
         /// <param name="_gid">直系的组的ID</param>
-        public PluginServiceBase(string _uid, string _gid) : base(_uid)
+        public ModuleServiceBase(string _uid, string _gid) : base(_uid)
         {
             gid_ = _gid;
         }
@@ -43,7 +43,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_request">Create的请求</param>
         /// <returns>错误</returns>
-        public virtual async Task<Error> CallCreate(PluginCreateRequest? _request, SynchronizationContext? _context)
+        public virtual async Task<Error> CallCreate(ModuleCreateRequest? _request, SynchronizationContext? _context)
         {
             getLogger()?.Trace("Call Create ...");
             if (null == _request)
@@ -76,7 +76,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_request">Update的请求</param>
         /// <returns>错误</returns>
-        public virtual async Task<Error> CallUpdate(PluginUpdateRequest? _request, SynchronizationContext? _context)
+        public virtual async Task<Error> CallUpdate(ModuleUpdateRequest? _request, SynchronizationContext? _context)
         {
             getLogger()?.Trace("Call Update ...");
             if (null == _request)
@@ -117,7 +117,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
                 return Error.NewNullErr("parameter:_request is null");
             }
 
-            PluginRetrieveResponse? response = null;
+            ModuleRetrieveResponse? response = null;
             if (null != mock.CallRetrieveDelegate)
             {
                 getLogger()?.Trace("use mock ...");
@@ -175,7 +175,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_request">List的请求</param>
         /// <returns>错误</returns>
-        public virtual async Task<Error> CallList(PluginListRequest? _request, SynchronizationContext? _context)
+        public virtual async Task<Error> CallList(ModuleListRequest? _request, SynchronizationContext? _context)
         {
             getLogger()?.Trace("Call List ...");
             if (null == _request)
@@ -183,7 +183,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
                 return Error.NewNullErr("parameter:_request is null");
             }
 
-            PluginListResponse? response = null;
+            ModuleListResponse? response = null;
             if (null != mock.CallListDelegate)
             {
                 getLogger()?.Trace("use mock ...");
@@ -208,7 +208,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_request">Search的请求</param>
         /// <returns>错误</returns>
-        public virtual async Task<Error> CallSearch(PluginSearchRequest? _request, SynchronizationContext? _context)
+        public virtual async Task<Error> CallSearch(ModuleSearchRequest? _request, SynchronizationContext? _context)
         {
             getLogger()?.Trace("Call Search ...");
             if (null == _request)
@@ -216,7 +216,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
                 return Error.NewNullErr("parameter:_request is null");
             }
 
-            PluginListResponse? response = null;
+            ModuleListResponse? response = null;
             if (null != mock.CallSearchDelegate)
             {
                 getLogger()?.Trace("use mock ...");
@@ -373,10 +373,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取直系数据层
         /// </summary>
         /// <returns>数据层</returns>
-        protected PluginModel? getModel()
+        protected ModuleModel? getModel()
         {
             if(null == model_)
-                model_ = findModel(PluginModel.NAME + "." + gid_) as PluginModel;
+                model_ = findModel(ModuleModel.NAME + "." + gid_) as ModuleModel;
             return model_;
         }
 
@@ -384,16 +384,16 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取GRPC客户端
         /// </summary>
         /// <returns>GRPC客户端</returns>
-        protected Plugin.PluginClient? getGrpcClient()
+        protected Module.ModuleClient? getGrpcClient()
         {
             if (null == grpcChannel_)
                 return null;
 
-            if(null == clientPlugin_)
+            if(null == clientModule_)
             {
-                clientPlugin_ = new Plugin.PluginClient(grpcChannel_);
+                clientModule_ = new Module.ModuleClient(grpcChannel_);
             }
-            return clientPlugin_;
+            return clientModule_;
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// GRPC客户端
         /// </summary>
-        protected Plugin.PluginClient? clientPlugin_;
+        protected Module.ModuleClient? clientModule_;
 
         /// <summary>
         /// GRPC通道
@@ -414,7 +414,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 直系数据层
         /// </summary>
-        private PluginModel? model_;
+        private ModuleModel? model_;
     }
 
 }

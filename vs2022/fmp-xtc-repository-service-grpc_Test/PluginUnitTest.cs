@@ -187,6 +187,7 @@ public class PluginTest : PluginUnitTestBase
 
         rspPrepare = await fixture_.getServicePlugin().PrepareUpload(reqPrepare, fixture_.context);
         Assert.NotEqual(0, rspPrepare.Status.Code);
+
     }
 
     public override async Task FlushUploadTest()
@@ -197,15 +198,73 @@ public class PluginTest : PluginUnitTestBase
         var rspCreate = await fixture_.getServicePlugin().Create(reqCreate, fixture_.context);
         Assert.Equal(0, rspCreate.Status.Code);
 
-        var reqPrepare = new UuidRequest();
-        reqPrepare.Uuid = rspCreate.Uuid;
-        var rspPrepare = await fixture_.getServicePlugin().FlushUpload(reqPrepare, fixture_.context);
-        Assert.Equal(0, rspPrepare.Status.Code);
+        var reqFlush = new UuidRequest();
+        reqFlush.Uuid = rspCreate.Uuid;
+        var rspFlush = await fixture_.getServicePlugin().FlushUpload(reqFlush, fixture_.context);
+        //MinIO Object Not Found
+        Assert.Equal(-500, rspFlush.Status.Code);
 
-        var rspDelete = await fixture_.getServicePlugin().Delete(reqPrepare, fixture_.context);
-        Assert.Equal(0, rspPrepare.Status.Code);
+        var rspDelete = await fixture_.getServicePlugin().Delete(reqFlush, fixture_.context);
+        Assert.Equal(0, rspDelete.Status.Code);
+    }
 
-        rspPrepare = await fixture_.getServicePlugin().FlushUpload(reqPrepare, fixture_.context);
-        Assert.NotEqual(0, rspPrepare.Status.Code);
+    public override async Task AddFlagTest()
+    {
+        // See FlagsTest
+        await Task.Run(() =>
+        {
+        });
+    }
+
+    public override async Task RemoveFlagTest()
+    {
+        // See FlagsTest
+        await Task.Run(() =>
+        {
+        });
+    }
+
+
+    [Fact]
+    public async void FlagsTest()
+    {
+        var reqCreate = new PluginCreateRequest();
+        reqCreate.Name = "TestFlag";
+        reqCreate.Version = "1.0.0";
+        var rspCreate = await fixture_.getServicePlugin().Create(reqCreate, fixture_.context);
+        Assert.Equal(0, rspCreate.Status.Code);
+
+        var reqFlag = new FlagOperationRequest();
+        reqFlag.Uuid = rspCreate.Uuid;
+        var reqRetrieve = new UuidRequest();
+        reqRetrieve.Uuid = rspCreate.Uuid;
+
+        reqFlag.Flag = 1;
+        var rspFlag = await fixture_.getServicePlugin().AddFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        var rspRetrieve = await fixture_.getServicePlugin().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1, rspRetrieve.Plugin.Flags);
+
+        reqFlag.Flag = 8;
+        rspFlag = await fixture_.getServicePlugin().AddFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServicePlugin().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1 | 8, rspRetrieve.Plugin.Flags);
+
+        rspFlag = await fixture_.getServicePlugin().RemoveFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServicePlugin().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1, rspRetrieve.Plugin.Flags);
+
+        reqFlag.Flag = 1;
+        rspFlag = await fixture_.getServicePlugin().RemoveFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServicePlugin().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(0, rspRetrieve.Plugin.Flags);
+
+        var reqDelete = new UuidRequest();
+        reqDelete.Uuid = rspCreate.Uuid;
+        var rspDelete = await fixture_.getServicePlugin().Delete(reqDelete, fixture_.context);
+        Assert.Equal(0, rspDelete.Status.Code);
     }
 }

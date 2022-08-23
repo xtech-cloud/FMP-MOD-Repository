@@ -84,9 +84,10 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                         Uuid = plugin.Uuid,
                         Name = plugin.Name,
                         Version = plugin.Version,
-                        Size = Utility.SizeToString(plugin.Size),
-                        Hash = plugin.Hash,
+                        Size = Utility.SizeToString(plugin.File.Size),
+                        Hash = plugin.File.Hash,
                         UpdatedAt = Utility.TimestampToString(plugin.UpdatedAt),
+                        _Locked = Flags.HasFlag(plugin.Flags, Flags.LOCK),
                     });
                 }
                 razor_.StateHasChanged();
@@ -112,7 +113,17 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             public void RefreshFlushUpload(IDTO _dto, SynchronizationContext? _context)
             {
-                throw new NotImplementedException();
+                razor_.StateHasChanged();
+            }
+
+            public void RefreshAddFlag(IDTO _dto, SynchronizationContext? _context)
+            {
+                razor_.StateHasChanged();
+            }
+
+            public void RefreshRemoveFlag(IDTO _dto, SynchronizationContext? _context)
+            {
+                razor_.StateHasChanged();
             }
 
             private PluginComponent razor_;
@@ -245,6 +256,8 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             public string? Hash { get; set; }
             [DisplayName("更新时间")]
             public string? UpdatedAt { get; set; }
+
+            public bool _Locked { get; set; } = false;
         }
 
 
@@ -294,6 +307,32 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
         }
 
         private void onCancelDelete()
+        {
+            //Nothing to do
+        }
+
+        private async Task onConfirmUnlock(string? _uuid)
+        {
+            if (string.IsNullOrEmpty(_uuid))
+                return;
+
+            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var req = new FlagOperationRequest();
+            req.Uuid = _uuid;
+            var dto = new FlagOperationRequestDTO(req);
+            Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
+
+        private void onCancelUnlock()
         {
             //Nothing to do
         }

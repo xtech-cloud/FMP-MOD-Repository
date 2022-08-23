@@ -48,12 +48,47 @@ message UuidResponse
     string uuid = 2;  // 唯一识别码
 }
 
+// 准备上传的回复
+message PrepareUploadResponse {
+    Status status = 1;  // 状态
+    string url = 2;  // 上传地址
+}
+
+// 完成上传的回复
+message FlushUploadResponse {
+    Status status = 1;  // 状态
+    string url = 2; // 下载地址
+}
+
+// 标志操作的请求
+message FlagOperationRequest {
+    string uuid = 1;  // 唯一识别码
+    uint64 flag = 2;  // 标志
+}
+
+message FileEntity
+{
+    string name = 1;  // 文件名
+    uint64 size = 2;  // 文件大小
+    string hash = 3;  // 文件哈希值
+}
+
 message PluginEntity
 {
     string uuid = 1;  // 唯一识别码
     string name = 2;  // 名称
     string version = 3;  // 版本号
-    uint64 size = 4;  // 文件大小
-    string hash = 5;  // 文件哈希值
+    uint64 flags = 4;  // 标记
     int64 updatedAt = 10;  // 更新时间
+    FileEntity file = 20; // 文件
+}
+
+message ModuleEntity
+{
+    string uuid = 1;  // 唯一识别码
+    string name = 2;  // 名称
+    string version = 3;  // 版本号
+    uint64 flags = 4;  // 标记
+    int64 updatedAt = 10;  // 更新时间
+    repeated FileEntity files = 20; // 文件
 }

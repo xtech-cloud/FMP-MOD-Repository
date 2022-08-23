@@ -10,16 +10,16 @@ using XTC.FMP.MOD.Repository.LIB.Proto;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     /// <summary>
-    /// Plugin数据层基类
+    /// Module数据层基类
     /// </summary>
-    public class PluginModelBase : Model
+    public class ModuleModelBase : Model
     {
         /// <summary>
         /// 带uid参数的构造函数
         /// </summary>
         /// <param name="_uid">实例化后的唯一识别码</param>
         /// <param name="_gid">直系的组的ID</param>
-        public PluginModelBase(string _uid, string _gid) : base(_uid)
+        public ModuleModelBase(string _uid, string _gid) : base(_uid)
         {
             gid_ = _gid;
         }
@@ -31,7 +31,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">Create的回复</param>
         public virtual void UpdateProtoCreate(UuidResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoCreate(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoCreate(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -40,16 +40,16 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">Update的回复</param>
         public virtual void UpdateProtoUpdate(UuidResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoUpdate(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoUpdate(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
         /// 更新Retrieve的数据
         /// </summary>
         /// <param name="_response">Retrieve的回复</param>
-        public virtual void UpdateProtoRetrieve(PluginRetrieveResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoRetrieve(ModuleRetrieveResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoRetrieve(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoRetrieve(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -58,25 +58,25 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">Delete的回复</param>
         public virtual void UpdateProtoDelete(UuidResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoDelete(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoDelete(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
         /// 更新List的数据
         /// </summary>
         /// <param name="_response">List的回复</param>
-        public virtual void UpdateProtoList(PluginListResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoList(ModuleListResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoList(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoList(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
         /// 更新Search的数据
         /// </summary>
         /// <param name="_response">Search的回复</param>
-        public virtual void UpdateProtoSearch(PluginListResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoSearch(ModuleListResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoSearch(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoSearch(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">PrepareUpload的回复</param>
         public virtual void UpdateProtoPrepareUpload(PrepareUploadResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoPrepareUpload(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoPrepareUpload(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">FlushUpload的回复</param>
         public virtual void UpdateProtoFlushUpload(FlushUploadResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoFlushUpload(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoFlushUpload(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">AddFlag的回复</param>
         public virtual void UpdateProtoAddFlag(UuidResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoAddFlag(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoAddFlag(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <param name="_response">RemoveFlag的回复</param>
         public virtual void UpdateProtoRemoveFlag(UuidResponse _response, SynchronizationContext? _context)
         {
-            getController()?.UpdateProtoRemoveFlag(status_ as PluginModel.PluginStatus, _response, _context);
+            getController()?.UpdateProtoRemoveFlag(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
 
 
@@ -120,10 +120,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 获取直系控制层
         /// </summary>
         /// <returns>控制层</returns>
-        protected PluginController? getController()
+        protected ModuleController? getController()
         {
             if(null == controller_)
-                controller_ = findController(PluginController.NAME + "." + gid_) as PluginController;
+                controller_ = findController(ModuleController.NAME + "." + gid_) as ModuleController;
             return controller_;
         }
 
@@ -135,7 +135,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// <summary>
         /// 直系控制层
         /// </summary>
-        private PluginController? controller_;
+        private ModuleController? controller_;
     }
 }
 

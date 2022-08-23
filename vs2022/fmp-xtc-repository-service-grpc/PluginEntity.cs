@@ -7,5 +7,6 @@
         public ulong Size { get; set; }
         public string? Hash { get; set; }
         public long UpdatedAt { get; set; }
+        public ulong Flags { get; set; }
     }
 }

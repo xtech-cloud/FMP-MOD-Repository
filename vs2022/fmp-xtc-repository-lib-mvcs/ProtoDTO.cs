@@ -31,6 +31,72 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 
 
 
+    public class ModuleCreateRequestDTO : IDTO
+    {
+        public ModuleCreateRequestDTO(ModuleCreateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleCreateRequest Value;
+    }
+
+
+
+    public class ModuleUpdateRequestDTO : IDTO
+    {
+        public ModuleUpdateRequestDTO(ModuleUpdateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleUpdateRequest Value;
+    }
+
+
+
+    public class ModuleRetrieveResponseDTO : IDTO
+    {
+        public ModuleRetrieveResponseDTO(ModuleRetrieveResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleRetrieveResponse Value;
+    }
+
+
+
+    public class ModuleListRequestDTO : IDTO
+    {
+        public ModuleListRequestDTO(ModuleListRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleListRequest Value;
+    }
+
+
+
+    public class ModuleListResponseDTO : IDTO
+    {
+        public ModuleListResponseDTO(ModuleListResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleListResponse Value;
+    }
+
+
+
+    public class ModuleSearchRequestDTO : IDTO
+    {
+        public ModuleSearchRequestDTO(ModuleSearchRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleSearchRequest Value;
+    }
+
+
+
     public class PluginCreateRequestDTO : IDTO
     {
         public PluginCreateRequestDTO(PluginCreateRequest _value)
@@ -93,28 +159,6 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             Value = _value;    
         }
         public readonly PluginSearchRequest Value;
-    }
-
-
-
-    public class PrepareUploadResponseDTO : IDTO
-    {
-        public PrepareUploadResponseDTO(PrepareUploadResponse _value)
-        {
-            Value = _value;    
-        }
-        public readonly PrepareUploadResponse Value;
-    }
-
-
-
-    public class FlushUploadResponseDTO : IDTO
-    {
-        public FlushUploadResponseDTO(FlushUploadResponse _value)
-        {
-            Value = _value;    
-        }
-        public readonly FlushUploadResponse Value;
     }
 
 
@@ -196,6 +240,50 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 
 
 
+    public class PrepareUploadResponseDTO : IDTO
+    {
+        public PrepareUploadResponseDTO(PrepareUploadResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly PrepareUploadResponse Value;
+    }
+
+
+
+    public class FlushUploadResponseDTO : IDTO
+    {
+        public FlushUploadResponseDTO(FlushUploadResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly FlushUploadResponse Value;
+    }
+
+
+
+    public class FlagOperationRequestDTO : IDTO
+    {
+        public FlagOperationRequestDTO(FlagOperationRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly FlagOperationRequest Value;
+    }
+
+
+
+    public class FileEntityDTO : IDTO
+    {
+        public FileEntityDTO(FileEntity _value)
+        {
+            Value = _value;    
+        }
+        public readonly FileEntity Value;
+    }
+
+
+
     public class PluginEntityDTO : IDTO
     {
         public PluginEntityDTO(PluginEntity _value)
@@ -203,6 +291,17 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             Value = _value;    
         }
         public readonly PluginEntity Value;
+    }
+
+
+
+    public class ModuleEntityDTO : IDTO
+    {
+        public ModuleEntityDTO(ModuleEntity _value)
+        {
+            Value = _value;    
+        }
+        public readonly ModuleEntity Value;
     }
 
 

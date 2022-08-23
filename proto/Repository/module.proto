@@ -5,6 +5,64 @@ import "shared.proto";
 option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
 package xtc.fmp.repository;
 
-// 模块
+// 插件
 service Module {
+    // 创建
+    rpc Create(ModuleCreateRequest) returns (UuidResponse) {}
+    // 更新
+    rpc Update(ModuleUpdateRequest) returns (UuidResponse) {}
+    // 读取
+    rpc Retrieve(UuidRequest) returns (ModuleRetrieveResponse) {}
+    // 删除
+    rpc Delete(UuidRequest) returns (UuidResponse) {}
+    // 列举
+    rpc List(ModuleListRequest) returns (ModuleListResponse) {}
+    // 搜索
+    rpc Search(ModuleSearchRequest) returns (ModuleListResponse) {}
+    // 准备上传
+    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
+    // 完成上传
+    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+    // 添加标志
+    rpc AddFlag(FlagOperationRequest) returns (UuidResponse) {}
+    // 移除标志
+    rpc RemoveFlag(FlagOperationRequest) returns (UuidResponse) {}
 }
+
+// 创建的请求
+message ModuleCreateRequest {
+    string name = 1;  // 名称
+    string version = 2;  // 版本号 
+}
+
+// 更新的请求
+message ModuleUpdateRequest {
+    string uuid = 1;  // 唯一识别码
+}
+
+// 读取的回复
+message ModuleRetrieveResponse {
+    Status status = 1;  // 状态
+    ModuleEntity Module = 2;  // Module实体
+}
+
+// 列举的请求
+message ModuleListRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+}
+
+// 列举的回复
+message ModuleListResponse {
+    Status status = 1;  // 状态
+    int64 total = 2;  // 总数
+    repeated ModuleEntity Modules = 3;  //  Module实体列表
+}
+
+// 搜索的请求
+message ModuleSearchRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+    string name = 3;  // 名称
+}
+

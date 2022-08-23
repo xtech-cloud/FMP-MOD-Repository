@@ -9,10 +9,10 @@ using XTC.FMP.LIB.MVCS;
 namespace XTC.FMP.MOD.Repository.LIB.Bridge
 {
     /// <summary>
-    /// Plugin的UI桥接层（协议部分）
+    /// Module的UI桥接层（协议部分）
     /// 刷新从视图收到的数据
     /// </summary>
-    public interface IPluginUiProtoBridge : View.Facade.Bridge
+    public interface IModuleUiProtoBridge : View.Facade.Bridge
     {
         /// <summary>
         /// 全局警告

@@ -1,0 +1,51 @@
+
+@page "/xtc/repository/module"
+
+<Space Direction="DirectionVHType.Vertical">
+    <SpaceItem>
+        <Button Type="@ButtonType.Primary" OnClick="@__debugClick">Call</Button>
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>Create:</Text>
+        <TextArea @bind-Value="@__debugCreate" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>Update:</Text>
+        <TextArea @bind-Value="@__debugUpdate" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>Retrieve:</Text>
+        <TextArea @bind-Value="@__debugRetrieve" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>Delete:</Text>
+        <TextArea @bind-Value="@__debugDelete" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>List:</Text>
+        <TextArea @bind-Value="@__debugList" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>Search:</Text>
+        <TextArea @bind-Value="@__debugSearch" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>PrepareUpload:</Text>
+        <TextArea @bind-Value="@__debugPrepareUpload" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+    <SpaceItem>
+        <Text>FlushUpload:</Text>
+        <TextArea @bind-Value="@__debugFlushUpload" Rows="4" ReadOnly="true" />
+    </SpaceItem>
+
+</Space>
+@code {
+}
