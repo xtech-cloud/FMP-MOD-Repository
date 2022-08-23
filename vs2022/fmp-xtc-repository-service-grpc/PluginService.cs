@@ -39,11 +39,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var plugin = await pluginDAO_.GetAsync(guid.ToString());
             if (null != plugin)
             {
-                return await Task.Run(() => new UuidResponse
+                return new UuidResponse
                 {
                     Status = new LIB.Proto.Status() { Code = 1, Message = "" },
                     Uuid = plugin.Uuid.ToString(),
-                });
+                };
             }
             plugin = new PluginEntity();
             plugin.Uuid = guid;
@@ -52,11 +52,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
             plugin.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             plugin.Flags = 0;
             await pluginDAO_.CreateAsync(plugin);
-            return await Task.Run(() => new UuidResponse
+            return new UuidResponse
             {
                 Status = new LIB.Proto.Status() { Code = 0, Message = "" },
                 Uuid = plugin.Uuid.ToString(),
-            });
+            };
         }
 
         protected override async Task<PluginRetrieveResponse> safeRetrieve(UuidRequest _request, ServerCallContext _context)
@@ -66,10 +66,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var plugin = await pluginDAO_.GetAsync(_request.Uuid);
             if (null == plugin)
             {
-                return new PluginRetrieveResponse
-                {
-                    Status = new LIB.Proto.Status() { Code = 1, Message = "not found" },
-                };
+                return new PluginRetrieveResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
             return new PluginRetrieveResponse
             {
@@ -173,7 +170,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
 
-            if(Flags.HasFlag(plugin.Flags, Flags.LOCK))
+            if (Flags.HasFlag(plugin.Flags, Flags.LOCK))
             {
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 2, Message = "Locked" } };
             }
@@ -205,8 +202,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var result = await minioClient_.StateObject(path);
             plugin.Hash = result.Key;
             plugin.Size = result.Value;
-            plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
-            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            if (!(plugin.Version?.Equals("develop") ?? false))
+            {
+                plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
+                await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            }
             var response = new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),

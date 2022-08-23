@@ -93,7 +93,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                         string tagName = file.Name.Replace(String.Format("fmp-{0}-{1}-lib-", module.Org, module.Name), "", true, null);
                         tagName = tagName.Replace(String.Format("{0}.FMP.MOD.{1}.LIB.", module.Org, module.Name), "", true, null);
                         tagName = tagName.Replace(String.Format("{0}_{1}", module.Org, module.Name), "", true, null);
-                        item.Tags[tagName] = string.IsNullOrEmpty(file.Hash) ? "red" : "greed";
+                        item.Tags[tagName] = string.IsNullOrEmpty(file.Hash) ? "red" : "green";
                     }
                     razor_.tableModel.Add(item);
                 }
@@ -127,11 +127,31 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             public void RefreshAddFlag(IDTO _dto, SynchronizationContext? _context)
             {
+                var dto = _dto as FlagOperationResponseDTO;
+                if (null == dto)
+                    return;
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item?.Uuid?.Equals(dto.Value.Uuid) ?? false;
+                });
+                if (null == item)
+                    return;
+                item.Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
                 razor_.StateHasChanged();
             }
 
             public void RefreshRemoveFlag(IDTO _dto, SynchronizationContext? _context)
             {
+                var dto = _dto as FlagOperationResponseDTO;
+                if (null == dto)
+                    return;
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item?.Uuid?.Equals(dto.Value.Uuid) ?? false;
+                });
+                if (null == item)
+                    return;
+                item.Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
                 razor_.StateHasChanged();
             }
 
@@ -338,6 +358,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             }
             var req = new FlagOperationRequest();
             req.Uuid = _uuid;
+            req.Flag = Flags.LOCK;
             var dto = new FlagOperationRequestDTO(req);
             Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
             if (!Error.IsOK(err))

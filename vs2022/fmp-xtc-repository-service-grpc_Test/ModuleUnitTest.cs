@@ -202,9 +202,23 @@ public class ModuleTest : ModuleUnitTestBase
 
     public override async Task PrepareUploadTest()
     {
-        var request = new UuidRequest();
-        var response = await fixture_.getServiceModule().PrepareUpload(request, fixture_.context);
-        Assert.Equal(0, response.Status.Code);
+        var reqCreate = new ModuleCreateRequest();
+        reqCreate.Org = "Test";
+        reqCreate.Name = "TestUpload";
+        reqCreate.Version = "1.0.0";
+        var rspCreate = await fixture_.getServiceModule().Create(reqCreate, fixture_.context);
+        Assert.Equal(0, rspCreate.Status.Code);
+
+        var reqPrepare = new UuidRequest();
+        reqPrepare.Uuid = rspCreate.Uuid;
+        var rspPrepare = await fixture_.getServiceModule().PrepareUpload(reqPrepare, fixture_.context);
+        Assert.Equal(0, rspPrepare.Status.Code);
+
+        var rspDelete = await fixture_.getServiceModule().Delete(reqPrepare, fixture_.context);
+        Assert.Equal(0, rspPrepare.Status.Code);
+
+        rspPrepare = await fixture_.getServiceModule().PrepareUpload(reqPrepare, fixture_.context);
+        Assert.NotEqual(0, rspPrepare.Status.Code);
     }
 
     public override async Task FlushUploadTest()

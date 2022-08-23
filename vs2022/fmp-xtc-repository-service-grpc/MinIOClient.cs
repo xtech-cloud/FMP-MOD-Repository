@@ -38,13 +38,35 @@ namespace XTC.FMP.MOD.Repository.App.Service
             return await presignedClient_.PresignedPutObjectAsync(args);
         }
 
-        public async Task<KeyValuePair<string ,ulong>> StateObject(string _path)
+        public async Task<KeyValuePair<string, ulong>> StateObject(string _path)
         {
             StatObjectArgs statObjectArgs = new StatObjectArgs()
                                             .WithBucket(settings_.Value.Bucket)
                                             .WithObject(_path);
-            ObjectStat objectStat = await client_.StatObjectAsync(statObjectArgs);
-            return new KeyValuePair<string, ulong>(objectStat.ETag, (ulong)objectStat.Size);
+            string etag = "";
+            ulong size = 0;
+            try
+            {
+                ObjectStat objectStat = await client_.StatObjectAsync(statObjectArgs);
+                etag = objectStat.ETag;
+                size = (ulong)objectStat.Size;
+            }
+            catch (ObjectNotFoundException ex)
+            {
+                etag = "";
+                size = 0;
+            }
+            return new KeyValuePair<string, ulong>(etag, size);
+        }
+
+        public async Task PutObject(string _path, Stream _stream)
+        {
+            PutObjectArgs putObjectArgs = new PutObjectArgs()
+                                                        .WithBucket(settings_.Value.Bucket)
+                                                        .WithObject(_path)
+                                                        .WithStreamData(_stream)
+                                                        .WithObjectSize(_stream.Length);
+            await client_.PutObjectAsync(putObjectArgs);
         }
 
 

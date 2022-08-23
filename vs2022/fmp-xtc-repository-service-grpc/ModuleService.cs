@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTC.FMP.MOD.Repository.LIB.Proto;
 using XTC.FMP.MOD.Repository.LIB.MVCS;
+using Newtonsoft.Json;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
@@ -39,11 +40,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var module = await moduleDAO_.GetAsync(guid.ToString());
             if (null != module)
             {
-                return await Task.Run(() => new UuidResponse
+                return new UuidResponse
                 {
                     Status = new LIB.Proto.Status() { Code = 1, Message = "" },
                     Uuid = module.Uuid.ToString(),
-                });
+                };
             }
             module = moduleDAO_.NewEmptyEntity(_request.Org, _request.Name);
             module.Uuid = guid;
@@ -66,10 +67,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var module = await moduleDAO_.GetAsync(_request.Uuid);
             if (null == module)
             {
-                return new ModuleRetrieveResponse
-                {
-                    Status = new LIB.Proto.Status() { Code = 1, Message = "not found" },
-                };
+                return new ModuleRetrieveResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
             return new ModuleRetrieveResponse
             {
@@ -148,7 +146,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             {
                 foreach (var file in module.HashMap.Keys)
                 {
-                    string path = string.Format("modules/{0}/{1}", module.Org, module.Name, file);
+                    string path = string.Format("modules/{0}/{1}@{2}/{3}", module.Org, module.Name, module.Version, file);
                     // 有效期1小时
                     string url = await minioClient_.PresignedPutObject(path, 60 * 60);
                     response.Urls.Add(file, url);
@@ -167,18 +165,33 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
 
+            Dictionary<string, object> manifests = new Dictionary<string, object>();
+            var entries = new List<object>();
             if (null != module.HashMap)
             {
                 foreach (var file in module.HashMap.Keys)
                 {
-                    string path = string.Format("modules/{0}/{1}", module.Org, module.Name, file);
+                    string path = string.Format("modules/{0}/{1}@{2}/{3}", module.Org, module.Name, module.Version, file);
                     var result = await minioClient_.StateObject(path);
                     module.HashMap[file] = result.Key;
                     module.SizeMap![file] = result.Value;
+                    Dictionary<string, object> entry = new Dictionary<string, object>();
+                    entry["file"] = file;
+                    entry["size"] = result.Value;
+                    entry["hash"] = result.Key;
+                    entries.Add(entry);
                 }
             }
-            module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
-            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            manifests["entries"] = entries;
+            // 保存Manifest到存储中
+            string filepath = string.Format("modules/{0}/{1}@{2}/manifest.json", module.Org, module.Name, module.Version);
+            byte[] manifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(manifests));
+            await minioClient_.PutObject(filepath, new MemoryStream(manifestJson));
+            if (!(module.Version?.Equals("develop") ?? false))
+            {
+                module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
+                await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            }
             return new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
