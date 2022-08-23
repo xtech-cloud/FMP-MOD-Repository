@@ -205,8 +205,8 @@ namespace XTC.FMP.MOD.Repository.App.Service
             if (!(plugin.Version?.Equals("develop") ?? false))
             {
                 plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
-                await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
             }
+            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
             var response = new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),

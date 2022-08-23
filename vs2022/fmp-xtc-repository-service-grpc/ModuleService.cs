@@ -190,8 +190,8 @@ namespace XTC.FMP.MOD.Repository.App.Service
             if (!(module.Version?.Equals("develop") ?? false))
             {
                 module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
-                await moduleDAO_.UpdateAsync(_request.Uuid, module);
             }
+            await moduleDAO_.UpdateAsync(_request.Uuid, module);
             return new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
