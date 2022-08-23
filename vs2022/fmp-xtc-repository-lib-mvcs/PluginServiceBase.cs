@@ -315,7 +315,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
                 return Error.NewNullErr("parameter:_request is null");
             }
 
-            UuidResponse? response = null;
+            FlagOperationResponse? response = null;
             if (null != mock.CallAddFlagDelegate)
             {
                 getLogger()?.Trace("use mock ...");
@@ -348,7 +348,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
                 return Error.NewNullErr("parameter:_request is null");
             }
 
-            UuidResponse? response = null;
+            FlagOperationResponse? response = null;
             if (null != mock.CallRemoveFlagDelegate)
             {
                 getLogger()?.Trace("use mock ...");

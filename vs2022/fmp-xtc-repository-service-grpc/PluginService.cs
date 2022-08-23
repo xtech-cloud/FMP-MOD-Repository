@@ -181,11 +181,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
             string path = string.Format("plugins/{0}@{1}.dll", plugin.Name, plugin.Version);
             // 有效期1小时
             string url = await minioClient_.PresignedPutObject(path, 60 * 60);
-            return new PrepareUploadResponse()
+            var response = new PrepareUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
-                Url = url,
+                Uuid = plugin.Uuid.ToString(),
             };
+            response.Urls.Add(String.Format("{0}@{1}.dll", plugin.Name, plugin.Version), url);
+            return response;
         }
 
         protected override async Task<FlushUploadResponse> safeFlushUpload(UuidRequest _request, ServerCallContext _context)
@@ -198,52 +200,59 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
 
-            string path = string.Format("plugins/{0}@{1}.dll", plugin.Name, plugin.Version);
+            string filename = string.Format("{0}@{1}.dll", plugin.Name, plugin.Version);
+            string path = string.Format("plugins/{0}", filename);
             var result = await minioClient_.StateObject(path);
             plugin.Hash = result.Key;
             plugin.Size = result.Value;
             plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
             await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
-            return new FlushUploadResponse()
+            var response = new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
-                Url = "",
+                Uuid = plugin.Uuid.ToString(),
             };
+            response.Flags = plugin.Flags;
+            response.Hashs[filename] = plugin.Hash;
+            response.Sizes[filename] = plugin.Size;
+            return response;
         }
 
-        protected override async Task<UuidResponse> safeAddFlag(FlagOperationRequest _request, ServerCallContext _context)
+        protected override async Task<FlagOperationResponse> safeAddFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
             var plugin = await pluginDAO_.GetAsync(_request.Uuid);
             if (null == plugin)
             {
-                return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
+                return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             plugin.Flags = Flags.AddFlag(plugin.Flags, _request.Flag);
             await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
-            return new UuidResponse()
+            return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),
                 Uuid = _request.Uuid,
+                Flags = plugin.Flags,
             };
         }
 
-        protected override async Task<UuidResponse> safeRemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
+        protected override async Task<FlagOperationResponse> safeRemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
             var plugin = await pluginDAO_.GetAsync(_request.Uuid);
             if (null == plugin)
             {
-                return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
+                return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             plugin.Flags = Flags.RemoveFlag(plugin.Flags, _request.Flag);
             await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
-            return new UuidResponse()
+            return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),
                 Uuid = _request.Uuid,
+                Flags = plugin.Flags,
             };
         }
     }

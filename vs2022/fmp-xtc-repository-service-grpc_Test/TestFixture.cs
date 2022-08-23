@@ -24,7 +24,7 @@ public class TestFixture : TestFixtureBase
 
     protected override void newModuleService()
     {
-        throw new NotImplementedException();
+        serviceModule_ = new ModuleService(new ModuleDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));
     }
 
     protected override void newPluginService()

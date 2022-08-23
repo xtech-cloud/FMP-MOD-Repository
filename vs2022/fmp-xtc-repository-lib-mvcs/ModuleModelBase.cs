@@ -101,7 +101,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 更新AddFlag的数据
         /// </summary>
         /// <param name="_response">AddFlag的回复</param>
-        public virtual void UpdateProtoAddFlag(UuidResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoAddFlag(FlagOperationResponse _response, SynchronizationContext? _context)
         {
             getController()?.UpdateProtoAddFlag(status_ as ModuleModel.ModuleStatus, _response, _context);
         }
@@ -110,7 +110,7 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 更新RemoveFlag的数据
         /// </summary>
         /// <param name="_response">RemoveFlag的回复</param>
-        public virtual void UpdateProtoRemoveFlag(UuidResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoRemoveFlag(FlagOperationResponse _response, SynchronizationContext? _context)
         {
             getController()?.UpdateProtoRemoveFlag(status_ as ModuleModel.ModuleStatus, _response, _context);
         }

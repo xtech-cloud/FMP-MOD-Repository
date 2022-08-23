@@ -102,7 +102,19 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             public void RefreshPrepareUpload(IDTO _dto, SynchronizationContext? _context)
             {
                 var dto = _dto as PrepareUploadResponseDTO;
-                string? uploadUrl = dto?.Value.Url;
+                if (null == dto)
+                    return;
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item.Uuid == dto.Value.Uuid;
+                });
+                if (null == item)
+                    return;
+
+                string uploadUrl = "";
+                if (!dto.Value.Urls.TryGetValue(String.Format("{0}@{1}.dll", item.Name, item.Version), out uploadUrl))
+                    return;
+
                 if (string.IsNullOrEmpty(uploadUrl))
                     return;
 
@@ -113,16 +125,51 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             public void RefreshFlushUpload(IDTO _dto, SynchronizationContext? _context)
             {
+                var dto = _dto as FlushUploadResponseDTO;
+                if (null == dto)
+                    return;
+
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item.Uuid == dto.Value.Uuid;
+                });
+                if (null == item)
+                    return;
+
+                string filename = string.Format("{0}@{1}.dll", item.Name, item.Version);
+                item._Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
+                item.Hash = dto.Value.Hashs[filename];
+                item.Size = Utility.SizeToString(dto.Value.Sizes[filename]);
                 razor_.StateHasChanged();
             }
 
             public void RefreshAddFlag(IDTO _dto, SynchronizationContext? _context)
             {
+                var dto = _dto as FlagOperationResponseDTO;
+                if (null == dto)
+                    return;
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item?.Uuid?.Equals(dto.Value.Uuid) ?? false;
+                });
+                if (null == item)
+                    return;
+                item._Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
                 razor_.StateHasChanged();
             }
 
             public void RefreshRemoveFlag(IDTO _dto, SynchronizationContext? _context)
             {
+                var dto = _dto as FlagOperationResponseDTO;
+                if (null == dto)
+                    return;
+                var item = razor_.tableModel.Find((_item) =>
+                {
+                    return _item?.Uuid?.Equals(dto.Value.Uuid) ?? false;
+                });
+                if (null == item)
+                    return;
+                item._Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
                 razor_.StateHasChanged();
             }
 
@@ -324,6 +371,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             }
             var req = new FlagOperationRequest();
             req.Uuid = _uuid;
+            req.Flag = Flags.LOCK;
             var dto = new FlagOperationRequestDTO(req);
             Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
             if (!Error.IsOK(err))
@@ -393,7 +441,15 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 logger_?.Error("bridge is null");
                 return;
             }
+            var item = tableModel.Find((_item) =>
+            {
+                return _item.Uuid == _uuid;
+            });
+            if (null == item)
+                return;
+
             uploadUuid = _uuid;
+
             var req = new UuidRequest();
             req.Uuid = _uuid;
             var dto = new UuidRequestDTO(req);

@@ -273,6 +273,17 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 
 
 
+    public class FlagOperationResponseDTO : IDTO
+    {
+        public FlagOperationResponseDTO(FlagOperationResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly FlagOperationResponse Value;
+    }
+
+
+
     public class FileEntityDTO : IDTO
     {
         public FileEntityDTO(FileEntity _value)

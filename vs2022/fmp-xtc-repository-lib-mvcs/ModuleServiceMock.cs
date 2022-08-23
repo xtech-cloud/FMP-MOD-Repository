@@ -31,9 +31,9 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 
         public System.Func<UuidRequest, Task<FlushUploadResponse>>? CallFlushUploadDelegate { get; set; } = null;
 
-        public System.Func<FlagOperationRequest, Task<UuidResponse>>? CallAddFlagDelegate { get; set; } = null;
+        public System.Func<FlagOperationRequest, Task<FlagOperationResponse>>? CallAddFlagDelegate { get; set; } = null;
 
-        public System.Func<FlagOperationRequest, Task<UuidResponse>>? CallRemoveFlagDelegate { get; set; } = null;
+        public System.Func<FlagOperationRequest, Task<FlagOperationResponse>>? CallRemoveFlagDelegate { get; set; } = null;
 
     }
 }

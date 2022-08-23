@@ -193,7 +193,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
         }
 
-        public override async Task<UuidResponse> AddFlag(FlagOperationRequest _request, ServerCallContext _context)
+        public override async Task<FlagOperationResponse> AddFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -201,21 +201,21 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
             catch (ArgumentRequiredException ex)
             {
-                return await Task.Run(() => new UuidResponse
+                return await Task.Run(() => new FlagOperationResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.BadRequest.GetHashCode(), Message = ex.Message },
                 });
             }
             catch (Exception ex)
             {
-                return await Task.Run(() => new UuidResponse
+                return await Task.Run(() => new FlagOperationResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.InternalServerError.GetHashCode(), Message = ex.Message },
                 });
             }
         }
 
-        public override async Task<UuidResponse> RemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
+        public override async Task<FlagOperationResponse> RemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
             try
             {
@@ -223,14 +223,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
             catch (ArgumentRequiredException ex)
             {
-                return await Task.Run(() => new UuidResponse
+                return await Task.Run(() => new FlagOperationResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.BadRequest.GetHashCode(), Message = ex.Message },
                 });
             }
             catch (Exception ex)
             {
-                return await Task.Run(() => new UuidResponse
+                return await Task.Run(() => new FlagOperationResponse
                 {
                     Status = new LIB.Proto.Status() { Code = -HttpStatusCode.InternalServerError.GetHashCode(), Message = ex.Message },
                 });
@@ -295,16 +295,16 @@ namespace XTC.FMP.MOD.Repository.App.Service
             });
         }
 
-        protected virtual async Task<UuidResponse> safeAddFlag(FlagOperationRequest _request, ServerCallContext _context)
+        protected virtual async Task<FlagOperationResponse> safeAddFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
-            return await Task.Run(() => new UuidResponse {
+            return await Task.Run(() => new FlagOperationResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }
 
-        protected virtual async Task<UuidResponse> safeRemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
+        protected virtual async Task<FlagOperationResponse> safeRemoveFlag(FlagOperationRequest _request, ServerCallContext _context)
         {
-            return await Task.Run(() => new UuidResponse {
+            return await Task.Run(() => new FlagOperationResponse {
                     Status = new LIB.Proto.Status() { Code = -1, Message = "Not Implemented" },
             });
         }

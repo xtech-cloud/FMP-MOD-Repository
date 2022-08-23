@@ -24,15 +24,16 @@ service Module {
     // 完成上传
     rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
     // 添加标志
-    rpc AddFlag(FlagOperationRequest) returns (UuidResponse) {}
+    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
     // 移除标志
-    rpc RemoveFlag(FlagOperationRequest) returns (UuidResponse) {}
+    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
 }
 
 // 创建的请求
 message ModuleCreateRequest {
-    string name = 1;  // 名称
-    string version = 2;  // 版本号 
+    string org = 1;  // 组织名
+    string name = 2;  // 名称
+    string version = 3;  // 版本号 
 }
 
 // 更新的请求
@@ -43,7 +44,7 @@ message ModuleUpdateRequest {
 // 读取的回复
 message ModuleRetrieveResponse {
     Status status = 1;  // 状态
-    ModuleEntity Module = 2;  // Module实体
+    ModuleEntity module = 2;  // Module实体
 }
 
 // 列举的请求
@@ -56,13 +57,14 @@ message ModuleListRequest {
 message ModuleListResponse {
     Status status = 1;  // 状态
     int64 total = 2;  // 总数
-    repeated ModuleEntity Modules = 3;  //  Module实体列表
+    repeated ModuleEntity modules = 3;  //  Module实体列表
 }
 
 // 搜索的请求
 message ModuleSearchRequest {
     int64 offset = 1;  // 偏移值
     int64 count = 2;  // 数量
-    string name = 3;  // 名称
+    string org = 3;  // 组织名
+    string name = 4;  // 名称
 }
 

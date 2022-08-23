@@ -157,8 +157,8 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 刷新AddFlag的数据
         /// </summary>
         /// <param name="_err">错误</param>
-        /// <param name="_dto">UuidResponse的数据传输对象</param>
-        public virtual void RefreshProtoAddFlag(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
+        /// <param name="_dto">FlagOperationResponse的数据传输对象</param>
+        public virtual void RefreshProtoAddFlag(Error _err, FlagOperationResponseDTO _dto, SynchronizationContext? _context)
         {
             var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))
@@ -173,8 +173,8 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// 刷新RemoveFlag的数据
         /// </summary>
         /// <param name="_err">错误</param>
-        /// <param name="_dto">UuidResponse的数据传输对象</param>
-        public virtual void RefreshProtoRemoveFlag(Error _err, UuidResponseDTO _dto, SynchronizationContext? _context)
+        /// <param name="_dto">FlagOperationResponse的数据传输对象</param>
+        public virtual void RefreshProtoRemoveFlag(Error _err, FlagOperationResponseDTO _dto, SynchronizationContext? _context)
         {
             var bridge = getFacade()?.getUiBridge() as IModuleUiBridge; 
             if (!Error.IsOK(_err))

@@ -24,9 +24,9 @@ service Plugin {
     // 完成上传
     rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
     // 添加标志
-    rpc AddFlag(FlagOperationRequest) returns (UuidResponse) {}
+    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
     // 移除标志
-    rpc RemoveFlag(FlagOperationRequest) returns (UuidResponse) {}
+    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
 }
 
 // 创建的请求

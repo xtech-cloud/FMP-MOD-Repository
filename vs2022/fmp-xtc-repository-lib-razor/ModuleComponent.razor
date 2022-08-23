@@ -1,51 +1,130 @@
-
 @page "/xtc/repository/module"
 
-<Space Direction="DirectionVHType.Vertical">
-    <SpaceItem>
-        <Button Type="@ButtonType.Primary" OnClick="@__debugClick">Call</Button>
-    </SpaceItem>
+@using System.ComponentModel
+@using AntDesign.TableModels
 
-    <SpaceItem>
-        <Text>Create:</Text>
-        <TextArea @bind-Value="@__debugCreate" Rows="4" ReadOnly="true" />
-    </SpaceItem>
+<Card>
+    <Form @ref="searchForm"
+          Loading="searchLoading"
+          Model="searchFormData"
+          OnFinish="@onSearchSubmit">
+        <Row Gutter="24">
+            @for (var i = 0; i < (searchExpand ? searchFormData.Count : (searchFormData.Count < 3 ? searchFormData.Count : 3)); i++)
+            {
+                var index = i;
+                <GridCol Span="8" @key="index">
+                    <FormItem Label="@(context[index].Text)">
+                        <Input @bind-Value="@(context[index].Value)" Placeholder="请输入" />
+                    </FormItem>
+                </GridCol>
+            }
+        </Row>
+        <Row>
+            <GridCol Span="24" Style="text-align:right;">
+                <Button Type="primary" HtmlType="submit">查询</Button>
+                <Button Style="margin: 0 8px;" OnClick="@onSearchResetClick">重置</Button>
+                <!--
+                <a style="font-size:12px" onclick="()=>{}">
+                    <Icon Type="@(searchExpand?"up":"down")"></Icon>  Collapse
+                </a>
+                -->
+            </GridCol>
+        </Row>
+    </Form>
+</Card>
 
-    <SpaceItem>
-        <Text>Update:</Text>
-        <TextArea @bind-Value="@__debugUpdate" Rows="4" ReadOnly="true" />
-    </SpaceItem>
+<Card Style="margin-top:24px">
+    <div style="display:flex; margin-bottom:24px;">
+        <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Plus" OnClick="@onCreateClick">创建</Button>
+    </div>
+    <Table TItem="TableModel" DataSource="@tableModel" Total="@tableTotal" PageIndex="tablePageIndex" PageSize="tablePageSize" OnPageIndexChange="onPageIndexChanged">
+        <PropertyColumn Property="c=>c.Name"></PropertyColumn>
+        <PropertyColumn Property="c=>c.Org"></PropertyColumn>
+        <PropertyColumn Property="c=>c.Version"></PropertyColumn>
+        <PropertyColumn Property="c=>c.Tags">
+            @foreach (var tag in context.Tags)
+            {
+                <Tag Color="@tag.Value">@tag.Key</Tag>
+            }
+        </PropertyColumn>
+        <Column @bind-Field="@context.UpdatedAt"></Column>
+        <PropertyColumn Property="c=>c.Locked">
+            <Switch Checked="@context.Locked" Disabled="true"></Switch>
+        </PropertyColumn>
+        <ActionColumn Title="操作" Fixed="right" Width="150">
+            <Space Size=@("middle")>
+                <SpaceItem>
+                    <Popconfirm Title="确定要解锁这个模块吗?"
+                                OnConfirm="@(()=>onConfirmUnlock(context.Uuid))"
+                                OnCancel="onCancelUnlock"
+                                OkText="确定"
+                                CancelText="取消">
+                        <Button Size="small">解锁</Button>
+                    </Popconfirm>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)" Disabled="true">上传</Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <Popconfirm Title="确定要删除这个模块吗?"
+                                OnConfirm="@(()=>onConfirmDelete(context.Uuid))"
+                                OnCancel="onCancelDelete"
+                                OkText="确定"
+                                CancelText="取消">
+                        <Button Danger Size="small">删除</Button>
+                    </Popconfirm>
+                </SpaceItem>
+            </Space>
+        </ActionColumn>
+    </Table>
+</Card>
 
-    <SpaceItem>
-        <Text>Retrieve:</Text>
-        <TextArea @bind-Value="@__debugRetrieve" Rows="4" ReadOnly="true" />
-    </SpaceItem>
+<Modal Title="创建模块"
+       Visible="@visibleCreateModal"
+       ConfirmLoading="@createLoading"
+       OnOk="@onCreateModalOk"
+       OnCancel="@onCreateModalCancel">
+    <Form Model="@createModel"
+          LabelColSpan="8"
+          WrapperColSpan="16"
+          OnFinish="onCreateSubmit"
+          @ref="@createForm">
+        <FormItem Label="组织">
+            <Input @bind-Value="@context.Org" />
+        </FormItem>
+        <FormItem Label="名称">
+            <Input @bind-Value="@context.Name" />
+        </FormItem>
+        <FormItem Label="版本号">
+            <Input @bind-Value="@context.Version" />
+        </FormItem>
+    </Form>
+</Modal>
 
-    <SpaceItem>
-        <Text>Delete:</Text>
-        <TextArea @bind-Value="@__debugDelete" Rows="4" ReadOnly="true" />
-    </SpaceItem>
+<Modal Title="上传插件"
+       Visible="@visibleUploadModal"
+       OnOk="@onUploadModalCancel"
+       OnCancel="@onUploadModalCancel">
+    <Upload Action="@uploadUrl"
+            Method="put"
+            Accept=".dll"
+            ShowUploadList="false"
+            OnChange="@onUploadChange"
+            OnSingleCompleted="@onUploadCompleted">
+        <Button Icon="upload">
+            <span>Upload</span>
+        </Button>
+    </Upload>
+    <Progress Percent=@uploadPercent ShowInfo="false" />
+</Modal>
 
-    <SpaceItem>
-        <Text>List:</Text>
-        <TextArea @bind-Value="@__debugList" Rows="4" ReadOnly="true" />
-    </SpaceItem>
 
-    <SpaceItem>
-        <Text>Search:</Text>
-        <TextArea @bind-Value="@__debugSearch" Rows="4" ReadOnly="true" />
-    </SpaceItem>
+<style>
+    .card-search-col {
+        margin-right: 64px;
+        margin-bottom: 24px;
+    }
+</style>
 
-    <SpaceItem>
-        <Text>PrepareUpload:</Text>
-        <TextArea @bind-Value="@__debugPrepareUpload" Rows="4" ReadOnly="true" />
-    </SpaceItem>
-
-    <SpaceItem>
-        <Text>FlushUpload:</Text>
-        <TextArea @bind-Value="@__debugFlushUpload" Rows="4" ReadOnly="true" />
-    </SpaceItem>
-
-</Space>
 @code {
 }

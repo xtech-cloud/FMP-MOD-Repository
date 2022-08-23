@@ -126,10 +126,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_status">直系状态</param>
         /// <param name="_response">AddFlag的回复</param>
-        public virtual void UpdateProtoAddFlag(PluginModel.PluginStatus? _status, UuidResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoAddFlag(PluginModel.PluginStatus? _status, FlagOperationResponse _response, SynchronizationContext? _context)
         {
             Error err = new Error(_response.Status.Code, _response.Status.Message);
-            UuidResponseDTO? dto = new UuidResponseDTO(_response);
+            FlagOperationResponseDTO? dto = new FlagOperationResponseDTO(_response);
             getView()?.RefreshProtoAddFlag(err, dto, _context);
         }
 
@@ -138,10 +138,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         /// </summary>
         /// <param name="_status">直系状态</param>
         /// <param name="_response">RemoveFlag的回复</param>
-        public virtual void UpdateProtoRemoveFlag(PluginModel.PluginStatus? _status, UuidResponse _response, SynchronizationContext? _context)
+        public virtual void UpdateProtoRemoveFlag(PluginModel.PluginStatus? _status, FlagOperationResponse _response, SynchronizationContext? _context)
         {
             Error err = new Error(_response.Status.Code, _response.Status.Message);
-            UuidResponseDTO? dto = new UuidResponseDTO(_response);
+            FlagOperationResponseDTO? dto = new FlagOperationResponseDTO(_response);
             getView()?.RefreshProtoRemoveFlag(err, dto, _context);
         }
 

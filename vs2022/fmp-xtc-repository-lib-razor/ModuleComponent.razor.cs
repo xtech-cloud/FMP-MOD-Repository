@@ -1,9 +1,12 @@
-
 using Microsoft.AspNetCore.Components;
 using XTC.FMP.LIB.MVCS;
 using XTC.FMP.MOD.Repository.LIB.Proto;
 using XTC.FMP.MOD.Repository.LIB.Bridge;
 using XTC.FMP.MOD.Repository.LIB.MVCS;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components.Forms;
+using System.ComponentModel;
+using AntDesign;
 
 namespace XTC.FMP.MOD.Repository.LIB.Razor
 {
@@ -24,58 +27,113 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 Task.Run(async () =>
                 {
                     await razor_.messageService_.Error(_message);
-                }); 
+                    razor_.createLoading = false;
+                    razor_.StateHasChanged();
+                });
             }
 
 
             public void RefreshCreate(IDTO _dto, SynchronizationContext? _context)
             {
-                var dto = _dto as UuidResponseDTO;
-                razor_.__debugCreate = dto?.Value.ToString();
+                razor_.createLoading = false;
+                razor_.visibleCreateModal = false;
+                razor_.StateHasChanged();
+
+                Task.Run(async () =>
+                {
+                    await razor_.listAll();
+                });
             }
 
             public void RefreshUpdate(IDTO _dto, SynchronizationContext? _context)
             {
                 var dto = _dto as UuidResponseDTO;
-                razor_.__debugUpdate = dto?.Value.ToString();
             }
 
             public void RefreshRetrieve(IDTO _dto, SynchronizationContext? _context)
             {
                 var dto = _dto as ModuleRetrieveResponseDTO;
-                razor_.__debugRetrieve = dto?.Value.ToString();
             }
 
             public void RefreshDelete(IDTO _dto, SynchronizationContext? _context)
             {
                 var dto = _dto as UuidResponseDTO;
-                razor_.__debugDelete = dto?.Value.ToString();
+                if (null == dto)
+                    return;
+                razor_.tableModel.RemoveAll((_item) =>
+                {
+                    return _item.Uuid?.Equals(dto.Value.Uuid) ?? false;
+                });
+
             }
 
             public void RefreshList(IDTO _dto, SynchronizationContext? _context)
             {
                 var dto = _dto as ModuleListResponseDTO;
-                razor_.__debugList = dto?.Value.ToString();
+                if (null == dto)
+                    return;
+
+                razor_.tableTotal = (int)dto.Value.Total;
+                razor_.tableModel.Clear();
+                foreach (var module in dto.Value.Modules)
+                {
+                    var item = new TableModel
+                    {
+                        Uuid = module.Uuid,
+                        Org = module.Org,
+                        Name = module.Name,
+                        Version = module.Version,
+                        //Size = Utility.SizeToString(Module.File.Size),
+                        //Hash = Module.File.Hash,
+                        UpdatedAt = Utility.TimestampToString(module.UpdatedAt),
+                        Locked = Flags.HasFlag(module.Flags, Flags.LOCK),
+                    };
+                    foreach (var file in module.Files)
+                    {
+                        string tagName = file.Name.Replace(String.Format("fmp-{0}-{1}-lib-", module.Org, module.Name), "", true, null);
+                        tagName = tagName.Replace(String.Format("{0}.FMP.MOD.{1}.LIB.", module.Org, module.Name), "", true, null);
+                        tagName = tagName.Replace(String.Format("{0}_{1}", module.Org, module.Name), "", true, null);
+                        item.Tags[tagName] = string.IsNullOrEmpty(file.Hash) ? "red" : "greed";
+                    }
+                    razor_.tableModel.Add(item);
+                }
+                razor_.StateHasChanged();
             }
 
             public void RefreshSearch(IDTO _dto, SynchronizationContext? _context)
             {
-                var dto = _dto as ModuleListResponseDTO;
-                razor_.__debugSearch = dto?.Value.ToString();
+                razor_.searchLoading = false;
+                RefreshList(_dto, _context);
             }
 
             public void RefreshPrepareUpload(IDTO _dto, SynchronizationContext? _context)
             {
+                /*
                 var dto = _dto as PrepareUploadResponseDTO;
-                razor_.__debugPrepareUpload = dto?.Value.ToString();
+                string? uploadUrl = dto?.Value.Url;
+                if (string.IsNullOrEmpty(uploadUrl))
+                    return;
+
+                razor_.visibleUploadModal = true;
+                razor_.uploadUrl = uploadUrl;
+                razor_.StateHasChanged();
+                */
             }
 
             public void RefreshFlushUpload(IDTO _dto, SynchronizationContext? _context)
             {
-                var dto = _dto as FlushUploadResponseDTO;
-                razor_.__debugFlushUpload = dto?.Value.ToString();
+                razor_.StateHasChanged();
             }
 
+            public void RefreshAddFlag(IDTO _dto, SynchronizationContext? _context)
+            {
+                razor_.StateHasChanged();
+            }
+
+            public void RefreshRemoveFlag(IDTO _dto, SynchronizationContext? _context)
+            {
+                razor_.StateHasChanged();
+            }
 
             private ModuleComponent razor_;
         }
@@ -83,9 +141,146 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            searchFormData[SearchField.Org.GetHashCode()] = new FormValue { Text = "组织", Value = "" };
+            searchFormData[SearchField.Name.GetHashCode()] = new FormValue { Text = "名称", Value = "" };
+            await listAll();
         }
 
-        private async Task __debugClick()
+        #region Search
+        private class FormValue
+        {
+            public string? Text { get; set; }
+            public string? Value { get; set; }
+        }
+
+        private bool searchLoading = false;
+        private AntDesign.Internal.IForm? searchForm;
+        private Dictionary<int, FormValue> searchFormData = new();
+        private bool searchExpand = false;
+
+        private enum SearchField
+        {
+            Org,
+            Name,
+        }
+
+        private async void onSearchSubmit(EditContext _context)
+        {
+            searchLoading = true;
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var req = new ModuleSearchRequest();
+            req.Offset = (tablePageIndex - 1) * tablePageSize;
+            req.Count = tablePageSize;
+            req.Org = searchFormData[SearchField.Org.GetHashCode()].Value ?? "";
+            req.Name = searchFormData[SearchField.Name.GetHashCode()].Value ?? "";
+            var dto = new ModuleSearchRequestDTO(req);
+            Error err = await bridge.OnSearchSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+
+        }
+
+        private async void onSearchResetClick()
+        {
+            searchForm?.Reset();
+            await listAll();
+        }
+        #endregion
+
+        #region Create Modal
+        private class CreateModel
+        {
+            [Required]
+            public string? Org { get; set; }
+            [Required]
+            public string? Name { get; set; }
+            [Required]
+            public string? Version { get; set; }
+        }
+
+        private bool visibleCreateModal = false;
+        private bool createLoading = false;
+        private AntDesign.Internal.IForm? createForm;
+        private CreateModel createModel = new();
+
+        private void onCreateClick()
+        {
+            visibleCreateModal = true;
+        }
+
+        private void onCreateModalOk()
+        {
+            createForm?.Submit();
+        }
+
+        private void onCreateModalCancel()
+        {
+            visibleCreateModal = false;
+        }
+
+        private async void onCreateSubmit(EditContext _context)
+        {
+            createLoading = true;
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var model = _context.Model as CreateModel;
+            if (null == model)
+            {
+                logger_?.Error("model is null");
+                return;
+            }
+            var req = new ModuleCreateRequest();
+            req.Org = model.Org;
+            req.Name = model.Name;
+            req.Version = model.Version;
+            ModuleCreateRequestDTO dto = new ModuleCreateRequestDTO(req);
+            Error err = await bridge.OnCreateSubmit(dto, SynchronizationContext.Current);
+            if (null != err)
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
+
+
+        #endregion
+
+        #region Table
+        private class TableModel
+        {
+            public string? Uuid { get; set; }
+
+            [DisplayName("名称")]
+            public string? Name { get; set; }
+            [DisplayName("组织")]
+            public string? Org { get; set; }
+            [DisplayName("版本")]
+            public string? Version { get; set; }
+            [DisplayName("更新时间")]
+            public string? UpdatedAt { get; set; }
+            [DisplayName("锁定")]
+            public bool Locked { get; set; } = false;
+            [DisplayName("文件")]
+            public Dictionary<string, string> Tags { get; set; } = new Dictionary<string, string>();
+        }
+
+
+        private List<TableModel> tableModel = new();
+        private int tableTotal = 0;
+        private int tablePageIndex = 1;
+        private int tablePageSize = 50;
+
+        private async Task listAll()
         {
             var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
             if (null == bridge)
@@ -93,65 +288,137 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 logger_?.Error("bridge is null");
                 return;
             }
-
-            var reqCreate = new ModuleCreateRequest();
-            var dtoCreate = new ModuleCreateRequestDTO(reqCreate);
-            logger_?.Trace("invoke OnCreateSubmit");
-            await bridge.OnCreateSubmit(dtoCreate, null);
-
-            var reqUpdate = new ModuleUpdateRequest();
-            var dtoUpdate = new ModuleUpdateRequestDTO(reqUpdate);
-            logger_?.Trace("invoke OnUpdateSubmit");
-            await bridge.OnUpdateSubmit(dtoUpdate, null);
-
-            var reqRetrieve = new UuidRequest();
-            var dtoRetrieve = new UuidRequestDTO(reqRetrieve);
-            logger_?.Trace("invoke OnRetrieveSubmit");
-            await bridge.OnRetrieveSubmit(dtoRetrieve, null);
-
-            var reqDelete = new UuidRequest();
-            var dtoDelete = new UuidRequestDTO(reqDelete);
-            logger_?.Trace("invoke OnDeleteSubmit");
-            await bridge.OnDeleteSubmit(dtoDelete, null);
-
-            var reqList = new ModuleListRequest();
-            var dtoList = new ModuleListRequestDTO(reqList);
-            logger_?.Trace("invoke OnListSubmit");
-            await bridge.OnListSubmit(dtoList, null);
-
-            var reqSearch = new ModuleSearchRequest();
-            var dtoSearch = new ModuleSearchRequestDTO(reqSearch);
-            logger_?.Trace("invoke OnSearchSubmit");
-            await bridge.OnSearchSubmit(dtoSearch, null);
-
-            var reqPrepareUpload = new UuidRequest();
-            var dtoPrepareUpload = new UuidRequestDTO(reqPrepareUpload);
-            logger_?.Trace("invoke OnPrepareUploadSubmit");
-            await bridge.OnPrepareUploadSubmit(dtoPrepareUpload, null);
-
-            var reqFlushUpload = new UuidRequest();
-            var dtoFlushUpload = new UuidRequestDTO(reqFlushUpload);
-            logger_?.Trace("invoke OnFlushUploadSubmit");
-            await bridge.OnFlushUploadSubmit(dtoFlushUpload, null);
-
+            var req = new ModuleListRequest();
+            req.Offset = (tablePageIndex - 1) * tablePageSize;
+            req.Count = tablePageSize;
+            var dto = new ModuleListRequestDTO(req);
+            Error err = await bridge.OnListSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
         }
 
+        private async Task onConfirmDelete(string? _uuid)
+        {
+            if (string.IsNullOrEmpty(_uuid))
+                return;
 
-        private string? __debugCreate;
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var req = new UuidRequest();
+            req.Uuid = _uuid;
+            var dto = new UuidRequestDTO(req);
+            Error err = await bridge.OnDeleteSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
 
-        private string? __debugUpdate;
+        private void onCancelDelete()
+        {
+            //Nothing to do
+        }
 
-        private string? __debugRetrieve;
+        private async Task onConfirmUnlock(string? _uuid)
+        {
+            if (string.IsNullOrEmpty(_uuid))
+                return;
 
-        private string? __debugDelete;
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var req = new FlagOperationRequest();
+            req.Uuid = _uuid;
+            var dto = new FlagOperationRequestDTO(req);
+            Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
 
-        private string? __debugList;
+        private void onCancelUnlock()
+        {
+            //Nothing to do
+        }
 
-        private string? __debugSearch;
+        private async void onPageIndexChanged(PaginationEventArgs args)
+        {
+            tablePageIndex = args.Page;
+            await listAll();
+        }
+        #endregion
 
-        private string? __debugPrepareUpload;
+        #region Upload
 
-        private string? __debugFlushUpload;
+        private bool visibleUploadModal = false;
+
+        private string? uploadUuid = "";
+        private string? uploadUrl = "";
+        private int uploadPercent = 0;
+
+        private void onUploadModalCancel()
+        {
+            visibleUploadModal = false;
+        }
+
+        private void onUploadChange(UploadInfo _fileinfo)
+        {
+            uploadPercent = _fileinfo.File.Percent;
+        }
+
+        private async void onUploadCompleted(UploadInfo _fileinfo)
+        {
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            var req = new UuidRequest();
+            req.Uuid = uploadUuid;
+            var dto = new UuidRequestDTO(req);
+            Error err = await bridge.OnFlushUploadSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
+
+        private async void onUploadClick(string? _uuid)
+        {
+            uploadPercent = 0;
+
+            if (string.IsNullOrEmpty(_uuid))
+                return;
+
+            var bridge = (getFacade()?.getViewBridge() as IModuleViewBridge);
+            if (null == bridge)
+            {
+                logger_?.Error("bridge is null");
+                return;
+            }
+            uploadUuid = _uuid;
+            var req = new UuidRequest();
+            req.Uuid = _uuid;
+            var dto = new UuidRequestDTO(req);
+            Error err = await bridge.OnPrepareUploadSubmit(dto, SynchronizationContext.Current);
+            if (!Error.IsOK(err))
+            {
+                logger_?.Error(err.getMessage());
+            }
+        }
+
+        #endregion
 
     }
 }
