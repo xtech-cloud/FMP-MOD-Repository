@@ -112,7 +112,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                     return;
 
                 string uploadUrl = "";
-                if (!dto.Value.Urls.TryGetValue(String.Format("{0}@{1}.dll", item.Name, item.Version), out uploadUrl))
+                if (!dto.Value.Urls.TryGetValue(String.Format("{0}.dll", item.Name), out uploadUrl))
                     return;
 
                 if (string.IsNullOrEmpty(uploadUrl))
@@ -136,7 +136,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 if (null == item)
                     return;
 
-                string filename = string.Format("{0}@{1}.dll", item.Name, item.Version);
+                string filename = string.Format("{0}.dll", item.Name);
                 item._Locked = Flags.HasFlag(dto.Value.Flags, Flags.LOCK);
                 item.Hash = dto.Value.Hashs[filename];
                 item.Size = Utility.SizeToString(dto.Value.Sizes[filename]);

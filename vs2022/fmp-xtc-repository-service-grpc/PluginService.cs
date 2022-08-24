@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTC.FMP.MOD.Repository.LIB.Proto;
 using XTC.FMP.MOD.Repository.LIB.MVCS;
+using Newtonsoft.Json;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
@@ -175,7 +176,8 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 2, Message = "Locked" } };
             }
 
-            string path = string.Format("plugins/{0}@{1}.dll", plugin.Name, plugin.Version);
+            string filename = string.Format("{0}.dll", plugin.Name);
+            string path = string.Format("plugins/{0}@{1}/{2}", plugin.Name, plugin.Version, filename);
             // 有效期1小时
             string url = await minioClient_.PresignedPutObject(path, 60 * 60);
             var response = new PrepareUploadResponse()
@@ -183,7 +185,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 Status = new LIB.Proto.Status(),
                 Uuid = plugin.Uuid.ToString(),
             };
-            response.Urls.Add(String.Format("{0}@{1}.dll", plugin.Name, plugin.Version), url);
+            response.Urls.Add(filename, url);
             return response;
         }
 
@@ -197,11 +199,25 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
 
-            string filename = string.Format("{0}@{1}.dll", plugin.Name, plugin.Version);
-            string path = string.Format("plugins/{0}", filename);
+            string filename = string.Format("{0}.dll", plugin.Name);
+            string path = string.Format("plugins/{0}@{1}/{2}", plugin.Name, plugin.Version, filename);
             var result = await minioClient_.StateObject(path);
             plugin.Hash = result.Key;
             plugin.Size = result.Value;
+
+            Dictionary<string, object> manifests = new Dictionary<string, object>();
+            var entries = new List<object>();
+            Dictionary<string, object> entry = new Dictionary<string, object>();
+            entry["file"] = filename;
+            entry["size"] = result.Value;
+            entry["hash"] = result.Key;
+            entries.Add(entry);
+            manifests["entries"] = entries;
+            // 保存Manifest到存储中
+            string manifestPath = string.Format("plugins/{0}@{1}/manifest.json", plugin.Name, plugin.Version);
+            byte[] manifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(manifests));
+            await minioClient_.PutObject(manifestPath, new MemoryStream(manifestJson));
+
             if (!(plugin.Version?.Equals("develop") ?? false))
             {
                 plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);

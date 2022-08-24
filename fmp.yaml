@@ -5,3 +5,9 @@ generate:
   database_driver: mongodb
   debug: false
   unity_solution: true
+publish:
+  active: true
+  org_name: XTC
+  module_name: Repository
+  environment: product
+  repository: grpc://localhost:18000
