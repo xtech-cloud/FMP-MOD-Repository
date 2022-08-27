@@ -7,6 +7,7 @@
         public string? Version { get; set; }
         public long UpdatedAt { get; set; }
         public ulong Flags { get; set; }
+        public string[]? Pages { get;set; }
 
         public Dictionary<string, ulong>? SizeMap{ get; set; }
         public Dictionary<string, string>? HashMap{ get; set; }

@@ -60,6 +60,29 @@ namespace XTC.FMP.MOD.Repository.App.Service
             });
         }
 
+        protected override async Task<UuidResponse> safeUpdate(ModuleUpdateRequest _request, ServerCallContext _context)
+        {
+            ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
+            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            if (null == module)
+            {
+                return new UuidResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
+            }
+
+            module.Pages = new string[_request.Pages.Count];
+            for (int i = 0; i < _request.Pages.Count; ++i)
+            {
+                module.Pages[i] = _request.Pages[i];
+            }
+            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+
+            return new UuidResponse
+            {
+                Status = new LIB.Proto.Status() { },
+                Uuid = module.Uuid.ToString(),
+            };
+        }
+
         protected override async Task<ModuleRetrieveResponse> safeRetrieve(UuidRequest _request, ServerCallContext _context)
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
@@ -192,6 +215,16 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
             }
             await moduleDAO_.UpdateAsync(_request.Uuid, module);
+
+            // 更新整个库的清单
+            // TODO 移到独立的服务中
+            {
+                var __modules = await moduleDAO_.ListDevelopAsync();
+                byte[] __modulesJson = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(__modules));
+                string __filepath = "modules/manifest@develop.json";
+                await minioClient_.PutObject(__filepath, new MemoryStream(__modulesJson));
+            }
+
             return new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),

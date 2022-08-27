@@ -10,4 +10,5 @@ publish:
   org_name: XTC
   module_name: Repository
   environment: product
-  repository: grpc://localhost:18000
+  service_port: 28000
+  repository: grpc://localhost:28000

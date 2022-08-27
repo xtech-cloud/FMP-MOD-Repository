@@ -33,12 +33,13 @@ service Module {
 message ModuleCreateRequest {
     string org = 1;  // 组织名
     string name = 2;  // 名称
-    string version = 3;  // 版本号 
+    string version = 3;  // 版本号
 }
 
 // 更新的请求
 message ModuleUpdateRequest {
     string uuid = 1;  // 唯一识别码
+    repeated string pages = 2; // 可访问的页面列表
 }
 
 // 读取的回复
