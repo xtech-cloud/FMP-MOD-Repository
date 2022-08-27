@@ -77,14 +77,16 @@ public class PluginTest : PluginUnitTestBase
 
     public override async Task ListTest()
     {
+        List<string> uuids = new List<string>();
         {
             for (int i = 0; i < 20; i++)
             {
                 var request = new PluginCreateRequest();
-                request.Name = "TestList" + i.ToString();
+                request.Name = "PluginTestList" + i.ToString();
                 request.Version = "1.0.0";
                 var response = await fixture_.getServicePlugin().Create(request, fixture_.context);
                 Assert.Equal(0, response.Status.Code);
+                uuids.Add(response.Uuid);
             }
         }
         {
@@ -101,9 +103,8 @@ public class PluginTest : PluginUnitTestBase
             Assert.Equal(2, response.Plugins.Count);
         }
         {
-            for (int i = 0; i < 20; i++)
+            foreach (var uuid in uuids)
             {
-                string uuid = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(String.Format("TestList{0}@1.0.0", i)))).ToString();
                 var request = new UuidRequest();
                 request.Uuid = uuid;
                 var response = await fixture_.getServicePlugin().Delete(request, fixture_.context);
@@ -115,21 +116,23 @@ public class PluginTest : PluginUnitTestBase
 
     public override async Task SearchTest()
     {
+        List<string> uuids = new List<string>();
         {
             for (int i = 0; i < 20; i++)
             {
                 var request = new PluginCreateRequest();
-                request.Name = "TestSearch" + (i + 1).ToString();
+                request.Name = "PluginTestSearch" + (i + 1).ToString();
                 request.Version = "1.0.0";
                 var response = await fixture_.getServicePlugin().Create(request, fixture_.context);
                 Assert.Equal(0, response.Status.Code);
+                uuids.Add(response.Uuid);
             }
         }
         {
             var request = new PluginSearchRequest();
             request.Offset = 0;
             request.Count = 10;
-            request.Name = "Search";
+            request.Name = "PluginTestSearch";
             var response = await fixture_.getServicePlugin().Search(request, fixture_.context);
             Assert.Equal(20, response.Total);
             Assert.Equal(10, response.Plugins.Count);
@@ -158,10 +161,10 @@ public class PluginTest : PluginUnitTestBase
             Assert.Equal(0, response.Total);
         }
         {
-            for (int i = 0; i < 20; i++)
+            foreach (var uuid in uuids)
             {
                 var request = new UuidRequest();
-                request.Uuid = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(String.Format("TestSearch{0}@1.0.0", i + 1)))).ToString();
+                request.Uuid = uuid;
                 var response = await fixture_.getServicePlugin().Delete(request, fixture_.context);
                 Assert.Equal(0, response.Status.Code);
             }
@@ -201,8 +204,7 @@ public class PluginTest : PluginUnitTestBase
         var reqFlush = new UuidRequest();
         reqFlush.Uuid = rspCreate.Uuid;
         var rspFlush = await fixture_.getServicePlugin().FlushUpload(reqFlush, fixture_.context);
-        //MinIO Object Not Found
-        Assert.Equal(-500, rspFlush.Status.Code);
+        Assert.Equal(0, rspFlush.Status.Code);
 
         var rspDelete = await fixture_.getServicePlugin().Delete(reqFlush, fixture_.context);
         Assert.Equal(0, rspDelete.Status.Code);

@@ -37,6 +37,8 @@ app.Use(async (context, next) =>
 app.UseGrpcWeb();
 
 
+app.MapGrpcService<AgentService>().EnableGrpcWeb();
+
 app.MapGrpcService<HealthyService>().EnableGrpcWeb();
 
 app.MapGrpcService<ModuleService>().EnableGrpcWeb();

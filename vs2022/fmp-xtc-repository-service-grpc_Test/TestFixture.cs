@@ -16,6 +16,10 @@ public class TestFixture : TestFixtureBase
         base.Dispose();
     }
 
+    protected override void newAgentService()
+    {
+        serviceAgent_ = new AgentService(new AgentDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));
+    }
 
     protected override void newHealthyService()
     {

@@ -228,13 +228,65 @@ public class ModuleTest : ModuleUnitTestBase
         Assert.Equal(0, response.Status.Code);
     }
 
-    public override Task AddFlagTest()
+    public override async Task AddFlagTest()
     {
-        throw new NotImplementedException();
+        // See FlagsTest
+        await Task.Run(() =>
+        {
+        });
     }
 
-    public override Task RemoveFlagTest()
+    public override async Task RemoveFlagTest()
     {
-        throw new NotImplementedException();
+        // See FlagsTest
+        await Task.Run(() =>
+        {
+        });
     }
+
+
+    [Fact]
+    public async void FlagsTest()
+    {
+        var reqCreate = new ModuleCreateRequest();
+        reqCreate.Org = "XTC";
+        reqCreate.Name = "TestFlag";
+        reqCreate.Version = "1.0.0";
+        var rspCreate = await fixture_.getServiceModule().Create(reqCreate, fixture_.context);
+        Assert.Equal(0, rspCreate.Status.Code);
+
+        var reqFlag = new FlagOperationRequest();
+        reqFlag.Uuid = rspCreate.Uuid;
+        var reqRetrieve = new UuidRequest();
+        reqRetrieve.Uuid = rspCreate.Uuid;
+
+        reqFlag.Flag = 1;
+        var rspFlag = await fixture_.getServiceModule().AddFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        var rspRetrieve = await fixture_.getServiceModule().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1, rspRetrieve.Module.Flags);
+
+        reqFlag.Flag = 8;
+        rspFlag = await fixture_.getServiceModule().AddFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServiceModule().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1 | 8, rspRetrieve.Module.Flags);
+
+        rspFlag = await fixture_.getServiceModule().RemoveFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServiceModule().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(1, rspRetrieve.Module.Flags);
+
+        reqFlag.Flag = 1;
+        rspFlag = await fixture_.getServiceModule().RemoveFlag(reqFlag, fixture_.context);
+        Assert.Equal(0, rspFlag.Status.Code);
+        rspRetrieve = await fixture_.getServiceModule().Retrieve(reqRetrieve, fixture_.context);
+        Assert.Equal<ulong>(0, rspRetrieve.Module.Flags);
+
+        var reqDelete = new UuidRequest();
+        reqDelete.Uuid = rspCreate.Uuid;
+        var rspDelete = await fixture_.getServiceModule().Delete(reqDelete, fixture_.context);
+        Assert.Equal(0, rspDelete.Status.Code);
+    }
+
 }

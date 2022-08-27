@@ -9,6 +9,72 @@ using XTC.FMP.MOD.Repository.LIB.Bridge;
 namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
 
+    public class AgentCreateRequestDTO : IDTO
+    {
+        public AgentCreateRequestDTO(AgentCreateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentCreateRequest Value;
+    }
+
+
+
+    public class AgentUpdateRequestDTO : IDTO
+    {
+        public AgentUpdateRequestDTO(AgentUpdateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentUpdateRequest Value;
+    }
+
+
+
+    public class AgentRetrieveResponseDTO : IDTO
+    {
+        public AgentRetrieveResponseDTO(AgentRetrieveResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentRetrieveResponse Value;
+    }
+
+
+
+    public class AgentListRequestDTO : IDTO
+    {
+        public AgentListRequestDTO(AgentListRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentListRequest Value;
+    }
+
+
+
+    public class AgentListResponseDTO : IDTO
+    {
+        public AgentListResponseDTO(AgentListResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentListResponse Value;
+    }
+
+
+
+    public class AgentSearchRequestDTO : IDTO
+    {
+        public AgentSearchRequestDTO(AgentSearchRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentSearchRequest Value;
+    }
+
+
+
     public class HealthyEchoRequestDTO : IDTO
     {
         public HealthyEchoRequestDTO(HealthyEchoRequest _value)
@@ -313,6 +379,17 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             Value = _value;    
         }
         public readonly ModuleEntity Value;
+    }
+
+
+
+    public class AgentEntityDTO : IDTO
+    {
+        public AgentEntityDTO(AgentEntity _value)
+        {
+            Value = _value;    
+        }
+        public readonly AgentEntity Value;
     }
 
 

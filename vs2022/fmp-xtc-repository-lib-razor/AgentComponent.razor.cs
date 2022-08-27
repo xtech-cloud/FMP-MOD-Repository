@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Components;
 using XTC.FMP.LIB.MVCS;
 using XTC.FMP.MOD.Repository.LIB.Proto;
@@ -11,12 +10,12 @@ using AntDesign;
 
 namespace XTC.FMP.MOD.Repository.LIB.Razor
 {
-    public partial class PluginComponent
+    public partial class AgentComponent
     {
-        public class PluginUiBridge : IPluginUiBridge
+        public class AgentUiBridge : IAgentUiBridge
         {
 
-            public PluginUiBridge(PluginComponent _razor)
+            public AgentUiBridge(AgentComponent _razor)
             {
                 razor_ = _razor;
             }
@@ -53,7 +52,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             public void RefreshRetrieve(IDTO _dto, SynchronizationContext? _context)
             {
-                var dto = _dto as PluginRetrieveResponseDTO;
+                var dto = _dto as AgentRetrieveResponseDTO;
             }
 
             public void RefreshDelete(IDTO _dto, SynchronizationContext? _context)
@@ -70,24 +69,25 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             public void RefreshList(IDTO _dto, SynchronizationContext? _context)
             {
-                var dto = _dto as PluginListResponseDTO;
+                var dto = _dto as AgentListResponseDTO;
                 if (null == dto)
                     return;
 
                 razor_.tableTotal = (int)dto.Value.Total;
                 razor_.tableModel.Clear();
-                foreach (var plugin in dto.Value.Plugins)
+                foreach (var agent in dto.Value.Agents)
                 {
 
                     razor_.tableModel.Add(new TableModel
                     {
-                        Uuid = plugin.Uuid,
-                        Name = plugin.Name,
-                        Version = plugin.Version,
-                        Size = Utility.SizeToString(plugin.File.Size),
-                        Hash = plugin.File.Hash,
-                        UpdatedAt = Utility.TimestampToString(plugin.UpdatedAt),
-                        _Locked = Flags.HasFlag(plugin.Flags, Flags.LOCK),
+                        Uuid = agent.Uuid,
+                        Org = agent.Org,
+                        Name = agent.Name,
+                        Version = agent.Version,
+                        Size = Utility.SizeToString(agent.File.Size),
+                        Hash = agent.File.Hash,
+                        UpdatedAt = Utility.TimestampToString(agent.UpdatedAt),
+                        _Locked = Flags.HasFlag(agent.Flags, Flags.LOCK),
                     });
                 }
                 razor_.StateHasChanged();
@@ -112,7 +112,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                     return;
 
                 string uploadUrl = "";
-                if (!dto.Value.Urls.TryGetValue(String.Format("{0}.dll", item.Name), out uploadUrl))
+                if (!dto.Value.Urls.TryGetValue(String.Format("{0}.{1}.zip", item.Org, item.Name), out uploadUrl))
                     return;
 
                 if (string.IsNullOrEmpty(uploadUrl))
@@ -173,12 +173,13 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_.StateHasChanged();
             }
 
-            private PluginComponent razor_;
+            private AgentComponent razor_;
         }
 
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            searchFormData[SearchField.Org.GetHashCode()] = new FormValue { Text = "组织", Value = "" };
             searchFormData[SearchField.Name.GetHashCode()] = new FormValue { Text = "名称", Value = "" };
             await listAll();
         }
@@ -197,23 +198,25 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
         private enum SearchField
         {
+            Org,
             Name,
         }
 
         private async void onSearchSubmit(EditContext _context)
         {
             searchLoading = true;
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
                 return;
             }
-            var req = new PluginSearchRequest();
+            var req = new AgentSearchRequest();
             req.Offset = (tablePageIndex - 1) * tablePageSize;
             req.Count = tablePageSize;
+            req.Org = searchFormData[SearchField.Org.GetHashCode()].Value ?? "";
             req.Name = searchFormData[SearchField.Name.GetHashCode()].Value ?? "";
-            var dto = new PluginSearchRequestDTO(req);
+            var dto = new AgentSearchRequestDTO(req);
             Error err = await bridge.OnSearchSubmit(dto, SynchronizationContext.Current);
             if (!Error.IsOK(err))
             {
@@ -232,6 +235,8 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
         #region Create Modal
         private class CreateModel
         {
+            [Required]
+            public string? Org { get; set; }
             [Required]
             public string? Name { get; set; }
             [Required]
@@ -261,7 +266,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
         private async void onCreateSubmit(EditContext _context)
         {
             createLoading = true;
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
@@ -273,10 +278,11 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 logger_?.Error("model is null");
                 return;
             }
-            var req = new PluginCreateRequest();
+            var req = new AgentCreateRequest();
+            req.Org = model.Org;
             req.Name = model.Name;
             req.Version = model.Version;
-            PluginCreateRequestDTO dto = new PluginCreateRequestDTO(req);
+            AgentCreateRequestDTO dto = new AgentCreateRequestDTO(req);
             Error err = await bridge.OnCreateSubmit(dto, SynchronizationContext.Current);
             if (null != err)
             {
@@ -292,11 +298,14 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
         {
             public string? Uuid { get; set; }
 
+            [DisplayName("组织")]
+            public string? Org { get; set; }
             [DisplayName("名称")]
             public string? Name { get; set; }
-
             [DisplayName("版本")]
             public string? Version { get; set; }
+            [DisplayName("默认端口")]
+            public uint Port { get; set; }
             [DisplayName("大小")]
             public string? Size { get; set; }
             [DisplayName("哈希值")]
@@ -315,16 +324,16 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
         private async Task listAll()
         {
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
                 return;
             }
-            var req = new PluginListRequest();
+            var req = new AgentListRequest();
             req.Offset = (tablePageIndex - 1) * tablePageSize;
             req.Count = tablePageSize;
-            var dto = new PluginListRequestDTO(req);
+            var dto = new AgentListRequestDTO(req);
             Error err = await bridge.OnListSubmit(dto, SynchronizationContext.Current);
             if (!Error.IsOK(err))
             {
@@ -337,7 +346,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             if (string.IsNullOrEmpty(_uuid))
                 return;
 
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
@@ -363,7 +372,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             if (string.IsNullOrEmpty(_uuid))
                 return;
 
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
@@ -412,7 +421,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
         private async void onUploadCompleted(UploadInfo _fileinfo)
         {
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");
@@ -435,7 +444,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             if (string.IsNullOrEmpty(_uuid))
                 return;
 
-            var bridge = (getFacade()?.getViewBridge() as IPluginViewBridge);
+            var bridge = (getFacade()?.getViewBridge() as IAgentViewBridge);
             if (null == bridge)
             {
                 logger_?.Error("bridge is null");

@@ -8,6 +8,7 @@ public static class MyProgram
         _builder?.Services.Configure<MinIOSettings>(_builder.Configuration.GetSection("MinIO"));
         _builder?.Services.AddSingleton<PluginDAO>();
         _builder?.Services.AddSingleton<ModuleDAO>();
+        _builder?.Services.AddSingleton<AgentDAO>();
         _builder?.Services.AddSingleton<MinIOClient>();
     }
 

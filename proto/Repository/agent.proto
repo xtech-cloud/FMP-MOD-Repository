@@ -1,0 +1,71 @@
+
+syntax = "proto3";
+import "shared.proto";
+
+option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
+package xtc.fmp.repository;
+
+// 微服务智能体
+service Agent {
+    // 创建
+    rpc Create(AgentCreateRequest) returns (UuidResponse) {}
+    // 更新
+    rpc Update(AgentUpdateRequest) returns (UuidResponse) {}
+    // 读取
+    rpc Retrieve(UuidRequest) returns (AgentRetrieveResponse) {}
+    // 删除
+    rpc Delete(UuidRequest) returns (UuidResponse) {}
+    // 列举
+    rpc List(AgentListRequest) returns (AgentListResponse) {}
+    // 搜索
+    rpc Search(AgentSearchRequest) returns (AgentListResponse) {}
+    // 准备上传
+    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
+    // 完成上传
+    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+    // 添加标志
+    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+    // 移除标志
+    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+}
+
+// 创建的请求
+message AgentCreateRequest {
+    string org = 1;  // 组织名
+    string name = 2;  // 名称
+    string version = 3;  // 版本号
+}
+
+// 更新的请求
+message AgentUpdateRequest {
+    string uuid = 1;  // 唯一识别码
+    uint32 port = 2;  // 默认端口号
+}
+
+// 读取的回复
+message AgentRetrieveResponse {
+    Status status = 1;  // 状态
+    AgentEntity agent = 2;  // Agent实体
+}
+
+// 列举的请求
+message AgentListRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+}
+
+// 列举的回复
+message AgentListResponse {
+    Status status = 1;  // 状态
+    int64 total = 2;  // 总数
+    repeated AgentEntity agents = 3;  //  Agent实体列表
+}
+
+// 搜索的请求
+message AgentSearchRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+    string org = 3;  // 组织名
+    string name = 4;  // 名称
+}
+

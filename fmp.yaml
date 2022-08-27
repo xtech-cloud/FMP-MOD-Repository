@@ -1,14 +1,16 @@
+org_name: XTC
+module_name: Repository
 generate:
   active: true
-  org_name: XTC
-  module_name: Repository
   database_driver: mongodb
   debug: false
   unity_solution: true
 publish:
   active: true
-  org_name: XTC
-  module_name: Repository
   environment: product
-  service_port: 28000
   repository: grpc://localhost:28000
+deploy:
+  active: true
+  environment: product
+  repository: grpc://localhost:28000
+  agent_port: 28000

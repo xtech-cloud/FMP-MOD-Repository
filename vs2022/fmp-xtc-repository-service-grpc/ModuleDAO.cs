@@ -297,11 +297,5 @@ namespace XTC.FMP.MOD.Repository.App.Service
             return new KeyValuePair<long, List<ModuleEntity>>(total, Modules);
         }
 
-        /// <summary>
-        /// 异步列举开发版本实体
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task<List<ModuleEntity>> ListDevelopAsync() =>
-            await collection_.Find(x => (!string.IsNullOrEmpty(x.Version) && x.Version.Equals("develop"))).ToListAsync();
     }
 }

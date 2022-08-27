@@ -1,9 +1,11 @@
 ﻿namespace XTC.FMP.MOD.Repository.App.Service
 {
-    public class PluginEntity : Entity
+    public class AgentEntity : Entity
     {
+        public string? Org { get; set; }
         public string? Name { get; set; }
         public string? Version { get; set; }
+        public uint Port { get; set; }
         public long UpdatedAt { get; set; }
         public ulong Flags { get; set; }
 

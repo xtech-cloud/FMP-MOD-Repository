@@ -23,9 +23,9 @@ namespace XTC.FMP.MOD.Repository.App.Service
         /// </remarks>
         /// <param name="_ModuleDAO">自动注入的数据操作对象</param>
         /// <param name="_minioClient">自动注入的MinIO客户端</param>
-        public ModuleService(ModuleDAO _ModuleDAO, MinIOClient _minioClient)
+        public ModuleService(ModuleDAO _moduleDAO, MinIOClient _minioClient)
         {
-            moduleDAO_ = _ModuleDAO;
+            moduleDAO_ = _moduleDAO;
             minioClient_ = _minioClient;
         }
 
@@ -215,15 +215,6 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
             }
             await moduleDAO_.UpdateAsync(_request.Uuid, module);
-
-            // 更新整个库的清单
-            // TODO 移到独立的服务中
-            {
-                var __modules = await moduleDAO_.ListDevelopAsync();
-                byte[] __modulesJson = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(__modules));
-                string __filepath = "modules/manifest@develop.json";
-                await minioClient_.PutObject(__filepath, new MemoryStream(__modulesJson));
-            }
 
             return new FlushUploadResponse()
             {

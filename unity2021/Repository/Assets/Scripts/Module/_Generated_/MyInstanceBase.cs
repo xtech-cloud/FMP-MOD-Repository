@@ -24,6 +24,8 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
         public ObjectsPool themeObjectsPool { get; private set; }
 
 
+        public IAgentViewBridge viewBridgeAgent { get; set; }
+
         public IHealthyViewBridge viewBridgeHealthy { get; set; }
 
         public IModuleViewBridge viewBridgeModule { get; set; }
@@ -71,6 +73,12 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
 
         public void SetupBridges()
         {
+
+            var facadeAgent = entry_.getDynamicAgentFacade(uid);
+            var bridgeAgent = new AgentUiBridge();
+            bridgeAgent.logger = logger_;
+            facadeAgent.setUiBridge(bridgeAgent);
+            viewBridgeAgent = facadeAgent.getViewBridge() as IAgentViewBridge;
 
             var facadeHealthy = entry_.getDynamicHealthyFacade(uid);
             var bridgeHealthy = new HealthyUiBridge();
@@ -196,6 +204,216 @@ namespace XTC.FMP.MOD.Repository.LIB.Unity
             return _uri;
         }
 
+
+        protected virtual void submitAgentCreate(AgentCreateRequest _request)
+        {
+            var dto = new AgentCreateRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnCreateSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentUpdate(AgentUpdateRequest _request)
+        {
+            var dto = new AgentUpdateRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnUpdateSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentRetrieve(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnRetrieveSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentDelete(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnDeleteSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentList(AgentListRequest _request)
+        {
+            var dto = new AgentListRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnListSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentSearch(AgentSearchRequest _request)
+        {
+            var dto = new AgentSearchRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnSearchSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentPrepareUpload(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnPrepareUploadSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentFlushUpload(UuidRequest _request)
+        {
+            var dto = new UuidRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnFlushUploadSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentAddFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnAddFlagSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
+
+        protected virtual void submitAgentRemoveFlag(FlagOperationRequest _request)
+        {
+            var dto = new FlagOperationRequestDTO(_request);
+            SynchronizationContext context = SynchronizationContext.Current;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var reslut = await viewBridgeAgent.OnRemoveFlagSubmit(dto, context);
+                    if (!LibMVCS.Error.IsOK(reslut))
+                    {
+                        logger_.Error(reslut.getMessage());
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    logger_.Exception(ex);
+                }
+            });
+        }
 
         protected virtual void submitHealthyEcho(HealthyEchoRequest _request)
         {

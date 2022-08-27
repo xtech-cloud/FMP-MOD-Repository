@@ -24,6 +24,25 @@ public abstract class TestFixtureBase : IDisposable
     }
 
 
+    protected AgentService? serviceAgent_ { get; set; }
+
+    public AgentService getServiceAgent()
+    {
+        if(null == serviceAgent_)
+        {
+            newAgentService();
+        }
+        return serviceAgent_!;
+    }
+
+    /// <summary>
+    /// 实例化服务
+    /// </summary>
+    /// <example>
+    /// serviceAgent_ = new AgentService(new AgentDAO(new DatabaseOptions()));
+    /// </example>
+    protected abstract void newAgentService();
+
     protected HealthyService? serviceHealthy_ { get; set; }
 
     public HealthyService getServiceHealthy()
