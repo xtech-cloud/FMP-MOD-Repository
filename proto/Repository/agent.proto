@@ -40,6 +40,7 @@ message AgentCreateRequest {
 message AgentUpdateRequest {
     string uuid = 1;  // 唯一识别码
     uint32 port = 2;  // 默认端口号
+    repeated string pages = 3; // 可访问的页面列表
 }
 
 // 读取的回复

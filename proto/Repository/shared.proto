@@ -100,7 +100,6 @@ message ModuleEntity
     string org = 2;  // 名称
     string name = 3;  // 名称
     string version = 4;  // 版本号
-    repeated string pages = 5;  // 可访问页面列表
     uint64 flags = 10;  // 标记
     int64 updatedAt = 11;  // 更新时间
     repeated FileEntity files = 20; // 文件
@@ -113,6 +112,7 @@ message AgentEntity
     string name = 3;  // 名称
     string version = 4;  // 版本号
     uint32 port = 5;  // 默认端口号
+    repeated string pages = 6;  // 可访问页面列表
     uint64 flags = 10;  // 标记
     int64 updatedAt = 11;  // 更新时间
     FileEntity file = 20; // 文件

@@ -14,6 +14,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             entity.Size = 0;
             entity.Hash = "";
             entity.Port = 0;
+            entity.Pages = new string[0];
             return entity;
         }
 
@@ -28,6 +29,10 @@ namespace XTC.FMP.MOD.Repository.App.Service
             entity.Flags = _entity.Flags;
             entity.UpdatedAt = _entity.UpdatedAt;
             string file = string.Format("{0}.{1}.zip", _entity.Org, _entity.Name);
+            foreach (var page in _entity.Pages ?? new string[0])
+            {
+                entity.Pages.Add(page);
+            }
             entity.File = new LIB.Proto.FileEntity
             {
                 Name = file,

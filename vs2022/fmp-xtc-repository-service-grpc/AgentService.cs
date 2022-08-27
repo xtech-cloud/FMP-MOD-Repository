@@ -71,6 +71,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
 
             agent.Port = _request.Port;
+            agent.Pages = new string[_request.Pages.Count];
+            for (int i = 0; i < _request.Pages.Count; ++i)
+            {
+                agent.Pages[i] = _request.Pages[i];
+            }
+
             await agentDAO_.UpdateAsync(_request.Uuid, agent);
 
             return new UuidResponse

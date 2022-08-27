@@ -13,7 +13,6 @@ namespace XTC.FMP.MOD.Repository.App.Service
             var entity = new ModuleEntity();
             entity.SizeMap = new Dictionary<string, ulong>();
             entity.HashMap = new Dictionary<string, string>();
-            entity.Pages = new string[0];
             //proto
             {
                 string file = string.Format("fmp-{0}-{1}-lib-proto.dll", _org?.ToLower(), _name?.ToLower());
@@ -98,10 +97,6 @@ namespace XTC.FMP.MOD.Repository.App.Service
             entity.Version = _entity.Version;
             entity.Flags = _entity.Flags;
             entity.UpdatedAt = _entity.UpdatedAt;
-            foreach (var page in _entity.Pages ?? new string[0])
-            {
-                entity.Pages.Add(page);
-            }
 
             //proto
             {
