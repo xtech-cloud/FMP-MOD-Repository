@@ -21,7 +21,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_ = _razor;
             }
 
-            public void Alert(string _code, string _message, SynchronizationContext? _context)
+            public void Alert(string _code, string _message, object? _context)
             {
                 if (null == razor_.messageService_)
                     return;
@@ -34,7 +34,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             }
 
 
-            public void RefreshCreate(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshCreate(IDTO _dto, object? _context)
             {
                 razor_.createLoading = false;
                 razor_.visibleCreateModal = false;
@@ -46,17 +46,17 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 });
             }
 
-            public void RefreshUpdate(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshUpdate(IDTO _dto, object? _context)
             {
                 var dto = _dto as UuidResponseDTO;
             }
 
-            public void RefreshRetrieve(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshRetrieve(IDTO _dto, object? _context)
             {
                 var dto = _dto as PluginRetrieveResponseDTO;
             }
 
-            public void RefreshDelete(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshDelete(IDTO _dto, object? _context)
             {
                 var dto = _dto as UuidResponseDTO;
                 if (null == dto)
@@ -68,7 +68,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
 
             }
 
-            public void RefreshList(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshList(IDTO _dto, object? _context)
             {
                 var dto = _dto as PluginListResponseDTO;
                 if (null == dto)
@@ -93,13 +93,13 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_.StateHasChanged();
             }
 
-            public void RefreshSearch(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshSearch(IDTO _dto, object? _context)
             {
                 razor_.searchLoading = false;
                 RefreshList(_dto, _context);
             }
 
-            public void RefreshPrepareUpload(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshPrepareUpload(IDTO _dto, object? _context)
             {
                 var dto = _dto as PrepareUploadResponseDTO;
                 if (null == dto)
@@ -123,7 +123,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_.StateHasChanged();
             }
 
-            public void RefreshFlushUpload(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshFlushUpload(IDTO _dto, object? _context)
             {
                 var dto = _dto as FlushUploadResponseDTO;
                 if (null == dto)
@@ -143,7 +143,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_.StateHasChanged();
             }
 
-            public void RefreshAddFlag(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshAddFlag(IDTO _dto, object? _context)
             {
                 var dto = _dto as FlagOperationResponseDTO;
                 if (null == dto)
@@ -158,7 +158,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                 razor_.StateHasChanged();
             }
 
-            public void RefreshRemoveFlag(IDTO _dto, SynchronizationContext? _context)
+            public void RefreshRemoveFlag(IDTO _dto, object? _context)
             {
                 var dto = _dto as FlagOperationResponseDTO;
                 if (null == dto)
@@ -214,7 +214,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Count = tablePageSize;
             req.Name = searchFormData[SearchField.Name.GetHashCode()].Value ?? "";
             var dto = new PluginSearchRequestDTO(req);
-            Error err = await bridge.OnSearchSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnSearchSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -346,7 +346,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = _uuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnDeleteSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnDeleteSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -373,7 +373,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Uuid = _uuid;
             req.Flag = Flags.LOCK;
             var dto = new FlagOperationRequestDTO(req);
-            Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnRemoveFlagSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -421,7 +421,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = uploadUuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnFlushUploadSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnFlushUploadSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -453,7 +453,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = _uuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnPrepareUploadSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnPrepareUploadSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());

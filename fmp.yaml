@@ -4,7 +4,7 @@ generate:
   active: true
   database_driver: mongodb
   debug: false
-  unity_solution: true
+  unity_solution: false
 publish:
   active: true
   environment: product
