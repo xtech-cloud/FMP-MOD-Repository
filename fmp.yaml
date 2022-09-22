@@ -1,16 +1,16 @@
 org_name: XTC
 module_name: Repository
 generate:
-  active: true
+  active: false
   database_driver: mongodb
   debug: false
   unity_solution: false
 publish:
   active: true
   environment: product
-  repository: grpc://localhost:28000
+  repository: grpc://api.xtech.cloud:28000
 deploy:
   active: true
   environment: product
-  repository: grpc://localhost:28000
+  repository: grpc://api.xtech.cloud:28000
   agent_port: 28000
