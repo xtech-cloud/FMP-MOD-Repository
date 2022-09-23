@@ -277,7 +277,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Name = model.Name;
             req.Version = model.Version;
             PluginCreateRequestDTO dto = new PluginCreateRequestDTO(req);
-            Error err = await bridge.OnCreateSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnCreateSubmit(dto, null);
             if (null != err)
             {
                 logger_?.Error(err.getMessage());
@@ -325,7 +325,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Offset = (tablePageIndex - 1) * tablePageSize;
             req.Count = tablePageSize;
             var dto = new PluginListRequestDTO(req);
-            Error err = await bridge.OnListSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnListSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());

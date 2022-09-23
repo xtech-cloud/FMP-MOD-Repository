@@ -265,7 +265,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Name = model.Name;
             req.Version = model.Version;
             ModuleCreateRequestDTO dto = new ModuleCreateRequestDTO(req);
-            Error err = await bridge.OnCreateSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnCreateSubmit(dto, null);
             if (null != err)
             {
                 logger_?.Error(err.getMessage());
@@ -312,7 +312,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Offset = (tablePageIndex - 1) * tablePageSize;
             req.Count = tablePageSize;
             var dto = new ModuleListRequestDTO(req);
-            Error err = await bridge.OnListSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnListSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -333,7 +333,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = _uuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnDeleteSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnDeleteSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -360,7 +360,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             req.Uuid = _uuid;
             req.Flag = Flags.LOCK;
             var dto = new FlagOperationRequestDTO(req);
-            Error err = await bridge.OnRemoveFlagSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnRemoveFlagSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -408,7 +408,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = uploadUuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnFlushUploadSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnFlushUploadSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
@@ -432,7 +432,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             var req = new UuidRequest();
             req.Uuid = _uuid;
             var dto = new UuidRequestDTO(req);
-            Error err = await bridge.OnPrepareUploadSubmit(dto, SynchronizationContext.Current);
+            Error err = await bridge.OnPrepareUploadSubmit(dto, null);
             if (!Error.IsOK(err))
             {
                 logger_?.Error(err.getMessage());
