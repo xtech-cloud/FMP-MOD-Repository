@@ -49,6 +49,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 entity.HashMap[file] = "";
                 entity.SizeMap[file] = 0;
             }
+            //json
+            {
+                string file = string.Format("{0}_{1}.json", _org, _name);
+                entity.HashMap[file] = "";
+                entity.SizeMap[file] = 0;
+            }
             //uab windows
             {
                 string file = string.Format("{0}_{1}@windows.uab", _org?.ToLower(), _name?.ToLower());
@@ -171,6 +177,20 @@ namespace XTC.FMP.MOD.Repository.App.Service
             //xml
             {
                 string file = string.Format("{0}_{1}.xml", _entity.Org, _entity.Name);
+                ulong size = 0;
+                _entity.SizeMap?.TryGetValue(file, out size);
+                string? hash = "";
+                _entity.HashMap?.TryGetValue(file, out hash);
+                entity.Files.Add(new LIB.Proto.FileEntity()
+                {
+                    Name = file,
+                    Hash = hash ?? "",
+                    Size = size,
+                });
+            }
+            //json
+            {
+                string file = string.Format("{0}_{1}.json", _entity.Org, _entity.Name);
                 ulong size = 0;
                 _entity.SizeMap?.TryGetValue(file, out size);
                 string? hash = "";
