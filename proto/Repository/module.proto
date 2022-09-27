@@ -39,6 +39,7 @@ message ModuleCreateRequest {
 // 更新的请求
 message ModuleUpdateRequest {
     string uuid = 1;  // 唯一识别码
+    string cli = 2; // 框架的版本
 }
 
 // 读取的回复

@@ -83,6 +83,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                         Org = module.Org,
                         Name = module.Name,
                         Version = module.Version,
+                        Cli = module.Cli,
                         //Size = Utility.SizeToString(Module.File.Size),
                         //Hash = Module.File.Hash,
                         UpdatedAt = Utility.TimestampToString(module.UpdatedAt),
@@ -286,6 +287,8 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
             public string? Org { get; set; }
             [DisplayName("版本")]
             public string? Version { get; set; }
+            [DisplayName("框架版本")]
+            public string? Cli { get; set; }
             [DisplayName("更新时间")]
             public string? UpdatedAt { get; set; }
             [DisplayName("锁定")]

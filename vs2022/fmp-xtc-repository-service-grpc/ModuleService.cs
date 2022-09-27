@@ -69,6 +69,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 return new UuidResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
 
+            module.Cli = _request.Cli;
             await moduleDAO_.UpdateAsync(_request.Uuid, module);
 
             return new UuidResponse
