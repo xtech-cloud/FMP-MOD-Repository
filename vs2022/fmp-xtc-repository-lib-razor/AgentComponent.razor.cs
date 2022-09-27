@@ -84,6 +84,7 @@ namespace XTC.FMP.MOD.Repository.LIB.Razor
                         Org = agent.Org,
                         Name = agent.Name,
                         Version = agent.Version,
+                        Port = agent.Port,
                         Size = Utility.SizeToString(agent.File.Size),
                         Hash = agent.File.Hash,
                         UpdatedAt = Utility.TimestampToString(agent.UpdatedAt),
