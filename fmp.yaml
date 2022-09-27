@@ -8,9 +8,9 @@ generate:
 publish:
   active: true
   environment: product
-  repository: grpc://api.xtech.cloud:28000
+  repository: grpcs://api.xtech.cloud:29000
 deploy:
   active: true
   environment: product
-  repository: grpc://api.xtech.cloud:28000
+  repository: grpcs://api.xtech.cloud:29000
   agent_port: 28000
