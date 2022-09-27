@@ -1,6 +1,7 @@
 @page "/xtc/repository/agent"
 
 @using System.ComponentModel
+@using XTC.FMP.MOD.Repository.LIB.MVCS
 
 <Card>
     <Form @ref="searchForm"
@@ -34,7 +35,10 @@
 
 <Card Style="margin-top:24px">
     <div style="display:flex; margin-bottom:24px;">
-        <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Plus" OnClick="@onCreateClick">创建</Button>
+        @if (permissionS_.ContainsKey(Permissions.AgentCreate))
+        {
+            <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Plus" OnClick="@onCreateClick">创建</Button>
+        }
     </div>
     <Table TItem="TableModel" DataSource="@tableModel" Total="@tableTotal" PageIndex="tablePageIndex" PageSize="tablePageSize" OnPageIndexChange="onPageIndexChanged">
         <Column @bind-Field="@context.Org"></Column>
@@ -49,27 +53,33 @@
         </ActionColumn>
         <ActionColumn Title="操作" Fixed="right" Width="150">
             <Space Size=@("middle")>
-                <SpaceItem>
-                    <Popconfirm Title="确定要解锁这个服务吗?"
+                @if (permissionS_.ContainsKey(Permissions.AgentUpdate))
+                {
+                    <SpaceItem>
+                        <Popconfirm Title="确定要解锁这个服务吗?"
                                 OnConfirm="@(()=>onConfirmUnlock(context.Uuid))"
                                 OnCancel="onCancelUnlock"
                                 OkText="确定"
                                 CancelText="取消">
-                        <Button Size="small">解锁</Button>
-                    </Popconfirm>
-                </SpaceItem>
-                <SpaceItem>
-                    <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)">上传</Button>
-                </SpaceItem>
-                <SpaceItem>
-                    <Popconfirm Title="确定要删除这个服务吗?"
+                            <Button Size="small">解锁</Button>
+                        </Popconfirm>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)">上传</Button>
+                    </SpaceItem>
+                }
+                @if (permissionS_.ContainsKey(Permissions.AgentDelete))
+                {
+                    <SpaceItem>
+                        <Popconfirm Title="确定要删除这个服务吗?"
                                 OnConfirm="@(()=>onConfirmDelete(context.Uuid))"
                                 OnCancel="onCancelDelete"
                                 OkText="确定"
                                 CancelText="取消">
-                        <Button Danger Size="small">删除</Button>
-                    </Popconfirm>
-                </SpaceItem>
+                            <Button Danger Size="small">删除</Button>
+                        </Popconfirm>
+                    </SpaceItem>
+                }
             </Space>
         </ActionColumn>
     </Table>
