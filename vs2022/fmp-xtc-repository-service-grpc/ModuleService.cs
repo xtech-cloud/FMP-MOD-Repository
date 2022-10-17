@@ -70,6 +70,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             }
 
             module.Cli = _request.Cli;
+            module.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             await moduleDAO_.UpdateAsync(_request.Uuid, module);
 
             return new UuidResponse
