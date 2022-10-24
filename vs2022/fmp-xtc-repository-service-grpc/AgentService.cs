@@ -11,22 +11,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
 {
     public class AgentService : AgentServiceBase
     {
-        private readonly MinIOClient minioClient_;
-        // 解开以下代码的注释，可支持数据库操作
-        private readonly AgentDAO agentDAO_;
+        private readonly SingletonServices singletonServices_;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <remarks>
-        /// 支持多个参数，均为自动注入，注入点位于MyProgram.PreBuild
-        /// </remarks>
-        /// <param name="_agentDAO">自动注入的数据操作对象</param>
-        /// <param name="_minioClient">自动注入的MinIO客户端</param>
-        public AgentService(AgentDAO _agentDAO, MinIOClient _minioClient)
+        public AgentService(SingletonServices _singletonServices)
         {
-            agentDAO_ = _agentDAO;
-            minioClient_ = _minioClient;
+            singletonServices_ = _singletonServices;
         }
 
         protected override async Task<UuidResponse> safeCreate(AgentCreateRequest _request, ServerCallContext _context)
@@ -37,7 +26,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             // 使用名字加上版本号的MD5值作为guid
             var guid = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(_request.Org + "/" + _request.Name + "@" + _request.Version)));
-            var agent = await agentDAO_.GetAsync(guid.ToString());
+            var agent = await singletonServices_.getAgentDAO().GetAsync(guid.ToString());
             if (null != agent)
             {
                 return new UuidResponse
@@ -46,14 +35,14 @@ namespace XTC.FMP.MOD.Repository.App.Service
                     Uuid = agent.Uuid.ToString(),
                 };
             }
-            agent = agentDAO_.NewEmptyAgent(_request.Org, _request.Name);
+            agent = singletonServices_.getAgentDAO().NewEmptyAgent(_request.Org, _request.Name);
             agent.Uuid = guid;
             agent.Org = _request.Org;
             agent.Name = _request.Name;
             agent.Version = _request.Version;
             agent.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             agent.Flags = 0;
-            await agentDAO_.CreateAsync(agent);
+            await singletonServices_.getAgentDAO().CreateAsync(agent);
             return new UuidResponse
             {
                 Status = new LIB.Proto.Status() { Code = 0, Message = "" },
@@ -64,7 +53,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         protected override async Task<UuidResponse> safeUpdate(AgentUpdateRequest _request, ServerCallContext _context)
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new UuidResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
@@ -77,7 +66,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 agent.Pages[i] = _request.Pages[i];
             }
 
-            await agentDAO_.UpdateAsync(_request.Uuid, agent);
+            await singletonServices_.getAgentDAO().UpdateAsync(_request.Uuid, agent);
 
             return new UuidResponse
             {
@@ -91,7 +80,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new AgentRetrieveResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
@@ -99,7 +88,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             return new AgentRetrieveResponse
             {
                 Status = new LIB.Proto.Status() { },
-                Agent = agentDAO_.ToProtoEntity(agent),
+                Agent = singletonServices_.getAgentDAO().ToProtoEntity(agent),
             };
         }
 
@@ -112,11 +101,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 Status = new LIB.Proto.Status(),
             };
 
-            response.Total = await agentDAO_.CountAsync();
-            var plugins = await agentDAO_.ListAsync((int)_request.Offset, (int)_request.Count);
+            response.Total = await singletonServices_.getAgentDAO().CountAsync();
+            var plugins = await singletonServices_.getAgentDAO().ListAsync((int)_request.Offset, (int)_request.Count);
             foreach (var agent in plugins)
             {
-                response.Agents.Add(agentDAO_.ToProtoEntity(agent));
+                response.Agents.Add(singletonServices_.getAgentDAO().ToProtoEntity(agent));
             }
             return response;
         }
@@ -125,12 +114,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredNumber((int)_request.Count, "Count");
 
-            var result = await agentDAO_.SearchAsync(_request.Offset, _request.Count, _request.Org, _request.Name);
+            var result = await singletonServices_.getAgentDAO().SearchAsync(_request.Offset, _request.Count, _request.Org, _request.Name);
             var response = new AgentListResponse() { Status = new LIB.Proto.Status() };
             response.Total = result.Key;
             foreach (var agent in result.Value)
             {
-                response.Agents.Add(agentDAO_.ToProtoEntity(agent));
+                response.Agents.Add(singletonServices_.getAgentDAO().ToProtoEntity(agent));
             }
             return response;
         }
@@ -139,13 +128,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
 
-            await agentDAO_.RemoveAsync(_request.Uuid);
+            await singletonServices_.getAgentDAO().RemoveAsync(_request.Uuid);
             return new UuidResponse() { Status = new LIB.Proto.Status(), Uuid = _request.Uuid };
         }
 
@@ -153,7 +142,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -167,7 +156,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             string filename = string.Format("{0}.{1}.zip", agent.Org, agent.Name);
             string path = string.Format("agents/{0}/{1}@{2}/{3}", agent.Org, agent.Name, agent.Version, filename);
             // 有效期1小时
-            string url = await minioClient_.PresignedPutObject(path, 60 * 60);
+            string url = await singletonServices_.getMinioClient().PresignedPutObject(path, 60 * 60);
             var response = new PrepareUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -181,7 +170,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -189,7 +178,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             string filename = string.Format("{0}.{1}.zip", agent.Org, agent.Name);
             string path = string.Format("agents/{0}/{1}@{2}/{3}", agent.Org, agent.Name, agent.Version, filename);
-            var result = await minioClient_.StateObject(path);
+            var result = await singletonServices_.getMinioClient().StateObject(path);
             agent.Hash = result.Key;
             agent.Size = result.Value;
 
@@ -205,13 +194,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
             // 保存Manifest到存储中
             string manifestPath = string.Format("agents/{0}/{1}@{2}/manifest.json", agent.Org, agent.Name, agent.Version);
             byte[] manifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(manifests));
-            await minioClient_.PutObject(manifestPath, new MemoryStream(manifestJson));
+            await singletonServices_.getMinioClient().PutObject(manifestPath, new MemoryStream(manifestJson));
 
             if (!(agent.Version?.Equals("develop") ?? false))
             {
                 agent.Flags = Flags.AddFlag(agent.Flags, Flags.LOCK);
             }
-            await agentDAO_.UpdateAsync(_request.Uuid, agent);
+            await singletonServices_.getAgentDAO().UpdateAsync(_request.Uuid, agent);
             var response = new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -222,10 +211,10 @@ namespace XTC.FMP.MOD.Repository.App.Service
             response.Sizes[filename] = agent.Size;
 
             // 保存整个清单
-            var allAgents = await agentDAO_.ListDevelopAsync();
+            var allAgents = await singletonServices_.getAgentDAO().ListDevelopAsync();
             string repoManifestPath = "agents/manifest.json";
             byte[] repoManifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(allAgents));
-            await minioClient_.PutObject(repoManifestPath, new MemoryStream(repoManifestJson));
+            await singletonServices_.getMinioClient().PutObject(repoManifestPath, new MemoryStream(repoManifestJson));
 
             return response;
         }
@@ -234,13 +223,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             agent.Flags = Flags.AddFlag(agent.Flags, _request.Flag);
-            await agentDAO_.UpdateAsync(_request.Uuid, agent);
+            await singletonServices_.getAgentDAO().UpdateAsync(_request.Uuid, agent);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -253,13 +242,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var agent = await agentDAO_.GetAsync(_request.Uuid);
+            var agent = await singletonServices_.getAgentDAO().GetAsync(_request.Uuid);
             if (null == agent)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             agent.Flags = Flags.RemoveFlag(agent.Flags, _request.Flag);
-            await agentDAO_.UpdateAsync(_request.Uuid, agent);
+            await singletonServices_.getAgentDAO().UpdateAsync(_request.Uuid, agent);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),

@@ -3,9 +3,9 @@ using MongoDB.Driver;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
-    public class ModuleDAO : DAO<ModuleEntity>
+    public class ModuleDAO : MongoDAO<ModuleEntity>
     {
-        public ModuleDAO(IOptions<DatabaseSettings> _settings) : base(_settings, "Module")
+        public ModuleDAO(IMongoDatabase _mongoDatabase) : base(_mongoDatabase, "Module")
         {
         }
         public ModuleEntity NewEmptyEntity(string? _org, string? _name)

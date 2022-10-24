@@ -6,9 +6,11 @@ using XTC.FMP.MOD.Repository.App.Service;
 /// </summary>
 public class TestFixture : TestFixtureBase
 {
+    private SingletonServices singletonServices_;
     public TestFixture()
         : base()
     {
+        singletonServices_ = new SingletonServices(new DatabaseOptions(), new MinIOOptions());
     }
 
     public override void Dispose()
@@ -18,7 +20,7 @@ public class TestFixture : TestFixtureBase
 
     protected override void newAgentService()
     {
-        serviceAgent_ = new AgentService(new AgentDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));
+        serviceAgent_ = new AgentService(singletonServices_);
     }
 
     protected override void newHealthyService()
@@ -28,12 +30,12 @@ public class TestFixture : TestFixtureBase
 
     protected override void newModuleService()
     {
-        serviceModule_ = new ModuleService(new ModuleDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));
+        serviceModule_ = new ModuleService(singletonServices_);
     }
 
     protected override void newPluginService()
     {
-        servicePlugin_ = new PluginService(new PluginDAO(new DatabaseOptions()), new MinIOClient(new MinIOOptions()));
+        servicePlugin_ = new PluginService(singletonServices_);
     }
 
 }

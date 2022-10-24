@@ -12,22 +12,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
 {
     public class PluginService : PluginServiceBase
     {
-        private readonly MinIOClient minioClient_;
-        // 解开以下代码的注释，可支持数据库操作
-        private readonly PluginDAO pluginDAO_;
+        private readonly SingletonServices singletonServices_;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <remarks>
-        /// 支持多个参数，均为自动注入，注入点位于MyProgram.PreBuild
-        /// </remarks>
-        /// <param name="_pluginDAO">自动注入的数据操作对象</param>
-        /// <param name="_minioClient">自动注入的MinIO客户端</param>
-        public PluginService(PluginDAO _pluginDAO, MinIOClient _minioClient)
+        public PluginService(SingletonServices _singletonServices)
         {
-            pluginDAO_ = _pluginDAO;
-            minioClient_ = _minioClient;
+            singletonServices_ = _singletonServices;
         }
 
         protected override async Task<UuidResponse> safeCreate(PluginCreateRequest _request, ServerCallContext _context)
@@ -37,7 +26,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             // 使用名字加上版本号的MD5值作为guid
             var guid = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(_request.Name + "@" + _request.Version)));
-            var plugin = await pluginDAO_.GetAsync(guid.ToString());
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(guid.ToString());
             if (null != plugin)
             {
                 return new UuidResponse
@@ -52,7 +41,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             plugin.Version = _request.Version;
             plugin.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
             plugin.Flags = 0;
-            await pluginDAO_.CreateAsync(plugin);
+            await singletonServices_.getPluginDAO().CreateAsync(plugin);
             return new UuidResponse
             {
                 Status = new LIB.Proto.Status() { Code = 0, Message = "" },
@@ -64,7 +53,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new PluginRetrieveResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
@@ -98,8 +87,8 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 Status = new LIB.Proto.Status(),
             };
 
-            response.Total = await pluginDAO_.CountAsync();
-            var plugins = await pluginDAO_.ListAsync((int)_request.Offset, (int)_request.Count);
+            response.Total = await singletonServices_.getPluginDAO().CountAsync();
+            var plugins = await singletonServices_.getPluginDAO().ListAsync((int)_request.Offset, (int)_request.Count);
             foreach (var plugin in plugins)
             {
                 response.Plugins.Add(new LIB.Proto.PluginEntity
@@ -124,7 +113,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredNumber((int)_request.Count, "Count");
 
-            var result = await pluginDAO_.SearchAsync(_request.Offset, _request.Count, _request.Name);
+            var result = await singletonServices_.getPluginDAO().SearchAsync(_request.Offset, _request.Count, _request.Name);
             var response = new PluginListResponse() { Status = new LIB.Proto.Status() };
             response.Total = result.Key;
             foreach (var plugin in result.Value)
@@ -151,13 +140,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
 
-            await pluginDAO_.RemoveAsync(_request.Uuid);
+            await singletonServices_.getPluginDAO().RemoveAsync(_request.Uuid);
             return new UuidResponse() { Status = new LIB.Proto.Status(), Uuid = _request.Uuid };
         }
 
@@ -165,7 +154,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -179,7 +168,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             string filename = string.Format("{0}.dll", plugin.Name);
             string path = string.Format("plugins/{0}@{1}/{2}", plugin.Name, plugin.Version, filename);
             // 有效期1小时
-            string url = await minioClient_.PresignedPutObject(path, 60 * 60);
+            string url = await singletonServices_.getMinioClient().PresignedPutObject(path, 60 * 60);
             var response = new PrepareUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -193,7 +182,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -201,7 +190,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             string filename = string.Format("{0}.dll", plugin.Name);
             string path = string.Format("plugins/{0}@{1}/{2}", plugin.Name, plugin.Version, filename);
-            var result = await minioClient_.StateObject(path);
+            var result = await singletonServices_.getMinioClient().StateObject(path);
             plugin.Hash = result.Key;
             plugin.Size = result.Value;
 
@@ -216,13 +205,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
             // 保存Manifest到存储中
             string manifestPath = string.Format("plugins/{0}@{1}/manifest.json", plugin.Name, plugin.Version);
             byte[] manifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(manifests));
-            await minioClient_.PutObject(manifestPath, new MemoryStream(manifestJson));
+            await singletonServices_.getMinioClient().PutObject(manifestPath, new MemoryStream(manifestJson));
 
             if (!(plugin.Version?.Equals("develop") ?? false))
             {
                 plugin.Flags = Flags.AddFlag(plugin.Flags, Flags.LOCK);
             }
-            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            await singletonServices_.getPluginDAO().UpdateAsync(_request.Uuid, plugin);
             var response = new FlushUploadResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -238,13 +227,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             plugin.Flags = Flags.AddFlag(plugin.Flags, _request.Flag);
-            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            await singletonServices_.getPluginDAO().UpdateAsync(_request.Uuid, plugin);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -257,13 +246,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var plugin = await pluginDAO_.GetAsync(_request.Uuid);
+            var plugin = await singletonServices_.getPluginDAO().GetAsync(_request.Uuid);
             if (null == plugin)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             plugin.Flags = Flags.RemoveFlag(plugin.Flags, _request.Flag);
-            await pluginDAO_.UpdateAsync(_request.Uuid, plugin);
+            await singletonServices_.getPluginDAO().UpdateAsync(_request.Uuid, plugin);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),

@@ -11,22 +11,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
 {
     public class ModuleService : ModuleServiceBase
     {
-        private readonly MinIOClient minioClient_;
-        // 解开以下代码的注释，可支持数据库操作
-        private readonly ModuleDAO moduleDAO_;
+        private readonly SingletonServices singletonServices_;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <remarks>
-        /// 支持多个参数，均为自动注入，注入点位于MyProgram.PreBuild
-        /// </remarks>
-        /// <param name="_ModuleDAO">自动注入的数据操作对象</param>
-        /// <param name="_minioClient">自动注入的MinIO客户端</param>
-        public ModuleService(ModuleDAO _moduleDAO, MinIOClient _minioClient)
+        public ModuleService(SingletonServices _singletonServices)
         {
-            moduleDAO_ = _moduleDAO;
-            minioClient_ = _minioClient;
+            singletonServices_ = _singletonServices;
         }
 
         protected override async Task<UuidResponse> safeCreate(ModuleCreateRequest _request, ServerCallContext _context)
@@ -37,7 +26,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             // 使用名字加上版本号的MD5值作为guid
             var guid = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(_request.Org + "/" + _request.Name + "@" + _request.Version)));
-            var module = await moduleDAO_.GetAsync(guid.ToString());
+            var module = await singletonServices_.getModuleDAO().GetAsync(guid.ToString());
             if (null != module)
             {
                 return new UuidResponse
@@ -46,13 +35,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
                     Uuid = module.Uuid.ToString(),
                 };
             }
-            module = moduleDAO_.NewEmptyEntity(_request.Org, _request.Name);
+            module = singletonServices_.getModuleDAO().NewEmptyEntity(_request.Org, _request.Name);
             module.Uuid = guid;
             module.Org = _request.Org;
             module.Name = _request.Name;
             module.Version = _request.Version;
             module.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
-            await moduleDAO_.CreateAsync(module);
+            await singletonServices_.getModuleDAO().CreateAsync(module);
             return await Task.Run(() => new UuidResponse
             {
                 Status = new LIB.Proto.Status() { Code = 0, Message = "" },
@@ -63,7 +52,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         protected override async Task<UuidResponse> safeUpdate(ModuleUpdateRequest _request, ServerCallContext _context)
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new UuidResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
@@ -71,7 +60,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
 
             module.Cli = _request.Cli;
             module.UpdatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
-            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            await singletonServices_.getModuleDAO().UpdateAsync(_request.Uuid, module);
 
             return new UuidResponse
             {
@@ -84,7 +73,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new ModuleRetrieveResponse { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
@@ -92,7 +81,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             return new ModuleRetrieveResponse
             {
                 Status = new LIB.Proto.Status() { },
-                Module = moduleDAO_.ToProtoEntity(module),
+                Module = singletonServices_.getModuleDAO().ToProtoEntity(module),
             };
         }
 
@@ -105,11 +94,11 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 Status = new LIB.Proto.Status(),
             };
 
-            response.Total = await moduleDAO_.CountAsync();
-            var modules = await moduleDAO_.ListAsync((int)_request.Offset, (int)_request.Count);
+            response.Total = await singletonServices_.getModuleDAO().CountAsync();
+            var modules = await singletonServices_.getModuleDAO().ListAsync((int)_request.Offset, (int)_request.Count);
             foreach (var module in modules)
             {
-                response.Modules.Add(moduleDAO_.ToProtoEntity(module));
+                response.Modules.Add(singletonServices_.getModuleDAO().ToProtoEntity(module));
             }
             return response;
         }
@@ -118,12 +107,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredNumber((int)_request.Count, "Count");
 
-            var result = await moduleDAO_.SearchAsync(_request.Offset, _request.Count, _request.Org, _request.Name);
+            var result = await singletonServices_.getModuleDAO().SearchAsync(_request.Offset, _request.Count, _request.Org, _request.Name);
             var response = new ModuleListResponse() { Status = new LIB.Proto.Status() };
             response.Total = result.Key;
             foreach (var module in result.Value)
             {
-                response.Modules.Add(moduleDAO_.ToProtoEntity(module));
+                response.Modules.Add(singletonServices_.getModuleDAO().ToProtoEntity(module));
             }
             return response;
         }
@@ -132,13 +121,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new UuidResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "not found" } };
             }
 
-            await moduleDAO_.RemoveAsync(_request.Uuid);
+            await singletonServices_.getModuleDAO().RemoveAsync(_request.Uuid);
             return new UuidResponse() { Status = new LIB.Proto.Status(), Uuid = _request.Uuid };
         }
 
@@ -146,7 +135,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new PrepareUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -168,7 +157,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 {
                     string path = string.Format("modules/{0}/{1}@{2}/{3}", module.Org, module.Name, module.Version, file);
                     // 有效期1小时
-                    string url = await minioClient_.PresignedPutObject(path, 60 * 60);
+                    string url = await singletonServices_.getMinioClient().PresignedPutObject(path, 60 * 60);
                     response.Urls.Add(file, url);
                 }
             }
@@ -179,7 +168,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new FlushUploadResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
@@ -192,7 +181,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
                 foreach (var file in module.HashMap.Keys)
                 {
                     string path = string.Format("modules/{0}/{1}@{2}/{3}", module.Org, module.Name, module.Version, file);
-                    var result = await minioClient_.StateObject(path);
+                    var result = await singletonServices_.getMinioClient().StateObject(path);
                     module.HashMap[file] = result.Key;
                     module.SizeMap![file] = result.Value;
                     Dictionary<string, object> entry = new Dictionary<string, object>();
@@ -206,12 +195,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
             // 保存Manifest到存储中
             string filepath = string.Format("modules/{0}/{1}@{2}/manifest.json", module.Org, module.Name, module.Version);
             byte[] manifestJson = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(manifests));
-            await minioClient_.PutObject(filepath, new MemoryStream(manifestJson));
+            await singletonServices_.getMinioClient().PutObject(filepath, new MemoryStream(manifestJson));
             if (!(module.Version?.Equals("develop") ?? false))
             {
                 module.Flags = Flags.AddFlag(module.Flags, Flags.LOCK);
             }
-            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            await singletonServices_.getModuleDAO().UpdateAsync(_request.Uuid, module);
 
             return new FlushUploadResponse()
             {
@@ -223,13 +212,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             module.Flags = Flags.AddFlag(module.Flags, _request.Flag);
-            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            await singletonServices_.getModuleDAO().UpdateAsync(_request.Uuid, module);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),
@@ -242,13 +231,13 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             ArgumentChecker.CheckRequiredString(_request.Uuid, "Uuid");
 
-            var module = await moduleDAO_.GetAsync(_request.Uuid);
+            var module = await singletonServices_.getModuleDAO().GetAsync(_request.Uuid);
             if (null == module)
             {
                 return new FlagOperationResponse() { Status = new LIB.Proto.Status() { Code = 1, Message = "Not Found" } };
             }
             module.Flags = Flags.RemoveFlag(module.Flags, _request.Flag);
-            await moduleDAO_.UpdateAsync(_request.Uuid, module);
+            await singletonServices_.getModuleDAO().UpdateAsync(_request.Uuid, module);
             return new FlagOperationResponse()
             {
                 Status = new LIB.Proto.Status(),

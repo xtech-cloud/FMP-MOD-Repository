@@ -3,9 +3,9 @@ using MongoDB.Driver;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
-    public class AgentDAO : DAO<AgentEntity>
+    public class AgentDAO : MongoDAO<AgentEntity>
     {
-        public AgentDAO(IOptions<DatabaseSettings> _settings) : base(_settings, "Agent")
+        public AgentDAO(IMongoDatabase _mongoDatabase) : base(_mongoDatabase, "Agent")
         {
         }
         public AgentEntity NewEmptyAgent(string? _org, string? _name)

@@ -3,9 +3,9 @@ using MongoDB.Driver;
 
 namespace XTC.FMP.MOD.Repository.App.Service
 {
-    public class PluginDAO : DAO<PluginEntity>
+    public class PluginDAO : MongoDAO<PluginEntity>
     {
-        public PluginDAO(IOptions<DatabaseSettings> _settings) : base(_settings, "Plugin")
+        public PluginDAO(IMongoDatabase _mongoDatabase) : base(_mongoDatabase, "Plugin")
         {
         }
 
