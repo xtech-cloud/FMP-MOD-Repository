@@ -67,10 +67,10 @@
                     <SpaceItem>
                         <Button Size="small" OnClick="()=>onUploadClick(context.Uuid)">上传</Button>
                     </SpaceItem>
-                    <SpaceItem>
-                        <Button Size="small" Type="@ButtonType.Primary" OnClick="()=>onDownloadClick(context.Uuid)">下载</Button>
-                    </SpaceItem>
                 }
+				<SpaceItem>
+					<Button Size="small" Type="@ButtonType.Primary" OnClick="()=>onDownloadClick(context.Uuid)">下载</Button>
+				</SpaceItem>
                 @if (permissionS_.ContainsKey(Permissions.ApplicationDelete))
                 {
                     <SpaceItem>
