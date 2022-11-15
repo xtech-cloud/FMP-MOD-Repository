@@ -75,6 +75,72 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 
 
 
+    public class ApplicationCreateRequestDTO : IDTO
+    {
+        public ApplicationCreateRequestDTO(ApplicationCreateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationCreateRequest Value;
+    }
+
+
+
+    public class ApplicationUpdateRequestDTO : IDTO
+    {
+        public ApplicationUpdateRequestDTO(ApplicationUpdateRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationUpdateRequest Value;
+    }
+
+
+
+    public class ApplicationRetrieveResponseDTO : IDTO
+    {
+        public ApplicationRetrieveResponseDTO(ApplicationRetrieveResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationRetrieveResponse Value;
+    }
+
+
+
+    public class ApplicationListRequestDTO : IDTO
+    {
+        public ApplicationListRequestDTO(ApplicationListRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationListRequest Value;
+    }
+
+
+
+    public class ApplicationListResponseDTO : IDTO
+    {
+        public ApplicationListResponseDTO(ApplicationListResponse _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationListResponse Value;
+    }
+
+
+
+    public class ApplicationSearchRequestDTO : IDTO
+    {
+        public ApplicationSearchRequestDTO(ApplicationSearchRequest _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationSearchRequest Value;
+    }
+
+
+
     public class HealthyEchoRequestDTO : IDTO
     {
         public HealthyEchoRequestDTO(HealthyEchoRequest _value)
@@ -390,6 +456,17 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             Value = _value;    
         }
         public readonly AgentEntity Value;
+    }
+
+
+
+    public class ApplicationEntityDTO : IDTO
+    {
+        public ApplicationEntityDTO(ApplicationEntity _value)
+        {
+            Value = _value;    
+        }
+        public readonly ApplicationEntity Value;
     }
 
 

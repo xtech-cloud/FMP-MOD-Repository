@@ -1,0 +1,71 @@
+
+syntax = "proto3";
+import "shared.proto";
+
+option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
+package xtc.fmp.repository;
+
+// 应用程序
+service Application {
+    // 创建
+    rpc Create(ApplicationCreateRequest) returns (UuidResponse) {}
+    // 更新
+    rpc Update(ApplicationUpdateRequest) returns (UuidResponse) {}
+    // 读取
+    rpc Retrieve(UuidRequest) returns (ApplicationRetrieveResponse) {}
+    // 删除
+    rpc Delete(UuidRequest) returns (UuidResponse) {}
+    // 列举
+    rpc List(ApplicationListRequest) returns (ApplicationListResponse) {}
+    // 搜索
+    rpc Search(ApplicationSearchRequest) returns (ApplicationListResponse) {}
+    // 准备上传
+    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
+    // 完成上传
+    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+    // 添加标志
+    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+    // 移除标志
+    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+}
+
+// 创建的请求
+message ApplicationCreateRequest {
+    string org = 1;  // 组织名
+    string name = 2;  // 名称
+    string version = 3;  // 版本号
+    string platform = 4; // 运行平台
+}
+
+// 更新的请求
+message ApplicationUpdateRequest {
+    string uuid = 1;  // 唯一识别码
+}
+
+// 读取的回复
+message ApplicationRetrieveResponse {
+    Status status = 1;  // 状态
+    ApplicationEntity Application = 2;  // Application实体
+}
+
+// 列举的请求
+message ApplicationListRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+}
+
+// 列举的回复
+message ApplicationListResponse {
+    Status status = 1;  // 状态
+    int64 total = 2;  // 总数
+    repeated ApplicationEntity Applications = 3;  //  Application实体列表
+}
+
+// 搜索的请求
+message ApplicationSearchRequest {
+    int64 offset = 1;  // 偏移值
+    int64 count = 2;  // 数量
+    string org = 3;  // 组织名
+    string name = 4;  // 名称
+}
+

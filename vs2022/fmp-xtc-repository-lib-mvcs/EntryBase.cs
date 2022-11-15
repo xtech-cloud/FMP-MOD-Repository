@@ -107,6 +107,44 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             return facade;
         }
 
+        protected Dictionary<string, ApplicationFacade?> facadeApplicationStaticMap_ = new Dictionary<string, ApplicationFacade?>();
+        protected Dictionary<string, ApplicationModel?> modelApplicationStaticMap_ = new Dictionary<string, ApplicationModel?>();
+        protected Dictionary<string, ApplicationView?> viewApplicationStaticMap_ = new Dictionary<string, ApplicationView?>();
+        protected Dictionary<string, ApplicationController?> controllerApplicationStaticMap_ = new Dictionary<string, ApplicationController?>();
+        protected Dictionary<string, ApplicationService?> serviceApplicationStaticMap_ = new Dictionary<string, ApplicationService?>();
+
+        protected Dictionary<string, ApplicationFacade?> facadeApplicationDynamicMap_ = new Dictionary<string, ApplicationFacade?>();
+        protected Dictionary<string, ApplicationModel?> modelApplicationDynamicMap_ = new Dictionary<string, ApplicationModel?>();
+        protected Dictionary<string, ApplicationView?> viewApplicationDynamicMap_ = new Dictionary<string, ApplicationView?>();
+        protected Dictionary<string, ApplicationController?> controllerApplicationDynamicMap_ = new Dictionary<string, ApplicationController?>();
+        protected Dictionary<string, ApplicationService?> serviceApplicationDynamicMap_ = new Dictionary<string, ApplicationService?>();
+
+        /// <summary>
+        /// 获取Application的UI装饰层
+        /// </summary>
+        /// <param name="_gid">直系的组的ID</param>
+        /// <returns>UI装饰层</returns>
+        public ApplicationFacade? getStaticApplicationFacade(string _gid)
+        {
+            ApplicationFacade? facade = null;
+            if (!facadeApplicationStaticMap_.TryGetValue(ApplicationFacade.NAME + "." + _gid, out facade))
+                return null;
+            return facade;
+        }
+
+        /// <summary>
+        /// 获取Application的UI装饰层
+        /// </summary>
+        /// <param name="_gid">直系的组的ID</param>
+        /// <returns>UI装饰层</returns>
+        public ApplicationFacade? getDynamicApplicationFacade(string _gid)
+        {
+            ApplicationFacade? facade = null;
+            if (!facadeApplicationDynamicMap_.TryGetValue(ApplicationFacade.NAME + "." + _gid, out facade))
+                return null;
+            return facade;
+        }
+
         protected Dictionary<string, HealthyFacade?> facadeHealthyStaticMap_ = new Dictionary<string, HealthyFacade?>();
         protected Dictionary<string, HealthyModel?> modelHealthyStaticMap_ = new Dictionary<string, HealthyModel?>();
         protected Dictionary<string, HealthyView?> viewHealthyStaticMap_ = new Dictionary<string, HealthyView?>();
@@ -282,6 +320,31 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             framework_.getStaticPipe().RegisterFacade(facadeAgent);
 
             // 注册数据层
+            var modelApplication = new ApplicationModel(ApplicationModel.NAME + "." + _gid, _gid);
+            modelApplicationStaticMap_[ApplicationModel.NAME + "." + _gid] = modelApplication;
+            framework_.getStaticPipe().RegisterModel(modelApplication);
+            // 注册视图层
+            var viewApplication = new ApplicationView(ApplicationView.NAME + "." + _gid, _gid);
+            viewApplicationStaticMap_[ApplicationView.NAME + "." + _gid] = viewApplication;
+            framework_.getStaticPipe().RegisterView(viewApplication);
+            // 注册控制层
+            var controllerApplication = new ApplicationController(ApplicationController.NAME + "." + _gid, _gid);
+            controllerApplicationStaticMap_[ApplicationController.NAME + "." + _gid] = controllerApplication;
+            framework_.getStaticPipe().RegisterController(controllerApplication);
+            // 注册服务层
+            var serviceApplication = new ApplicationService(ApplicationService.NAME + "." + _gid, _gid);
+            serviceApplicationStaticMap_[ApplicationService.NAME + "." + _gid] = serviceApplication;
+            framework_.getStaticPipe().RegisterService(serviceApplication);
+            serviceApplication.InjectGrpcChannel(options_?.getChannel());
+            // 注册UI装饰层
+            var facadeApplication = new ApplicationFacade(ApplicationFacade.NAME + "." + _gid, _gid);
+            facadeApplicationStaticMap_[ApplicationFacade.NAME + "." + _gid] = facadeApplication;
+            var bridgeApplication = new ApplicationViewBridge();
+            bridgeApplication.service = serviceApplication;
+            facadeApplication.setViewBridge(bridgeApplication);
+            framework_.getStaticPipe().RegisterFacade(facadeApplication);
+
+            // 注册数据层
             var modelHealthy = new HealthyModel(HealthyModel.NAME + "." + _gid, _gid);
             modelHealthyStaticMap_[HealthyModel.NAME + "." + _gid] = modelHealthy;
             framework_.getStaticPipe().RegisterModel(modelHealthy);
@@ -398,6 +461,31 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             bridgeAgent.service = serviceAgent;
             facadeAgent.setViewBridge(bridgeAgent);
             framework_.getDynamicPipe().PushFacade(facadeAgent);
+
+            // 注册数据层
+            var modelApplication = new ApplicationModel(ApplicationModel.NAME + "." + _gid, _gid);
+            modelApplicationDynamicMap_[ApplicationModel.NAME + "." + _gid] = modelApplication;
+            framework_.getDynamicPipe().PushModel(modelApplication);
+            // 注册视图层
+            var viewApplication = new ApplicationView(ApplicationView.NAME + "." + _gid, _gid);
+            viewApplicationDynamicMap_[ApplicationView.NAME + "." + _gid] = viewApplication;
+            framework_.getDynamicPipe().PushView(viewApplication);
+            // 注册控制层
+            var controllerApplication = new ApplicationController(ApplicationController.NAME + "." + _gid, _gid);
+            controllerApplicationDynamicMap_[ApplicationController.NAME + "." + _gid] = controllerApplication;
+            framework_.getDynamicPipe().PushController(controllerApplication);
+            // 注册服务层
+            var serviceApplication = new ApplicationService(ApplicationService.NAME + "." + _gid, _gid);
+            serviceApplicationDynamicMap_[ApplicationService.NAME + "." + _gid] = serviceApplication;
+            framework_.getDynamicPipe().PushService(serviceApplication);
+            serviceApplication.InjectGrpcChannel(options_?.getChannel());
+            // 注册UI装饰层
+            var facadeApplication = new ApplicationFacade(ApplicationFacade.NAME + "." + _gid, _gid);
+            facadeApplicationDynamicMap_[ApplicationFacade.NAME + "." + _gid] = facadeApplication;
+            var bridgeApplication = new ApplicationViewBridge();
+            bridgeApplication.service = serviceApplication;
+            facadeApplication.setViewBridge(bridgeApplication);
+            framework_.getDynamicPipe().PushFacade(facadeApplication);
 
             // 注册数据层
             var modelHealthy = new HealthyModel(HealthyModel.NAME + "." + _gid, _gid);
@@ -526,6 +614,42 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             {
                 framework_.getStaticPipe().CancelModel(modelAgent);
                 modelAgentStaticMap_.Remove(AgentModel.NAME + "." +_gid);
+            }
+
+            // 注销服务层
+            ApplicationService? serviceApplication;
+            if(serviceApplicationStaticMap_.TryGetValue(ApplicationService.NAME + "." + _gid, out serviceApplication))
+            {
+                framework_.getStaticPipe().CancelService(serviceApplication);
+                serviceApplicationStaticMap_.Remove(ApplicationService.NAME + "." +_gid);
+            }
+            // 注销控制层
+            ApplicationController? controllerApplication;
+            if(controllerApplicationStaticMap_.TryGetValue(ApplicationController.NAME + "." + _gid, out controllerApplication))
+            {
+                framework_.getStaticPipe().CancelController(controllerApplication);
+                controllerApplicationStaticMap_.Remove(ApplicationController.NAME + "." +_gid);
+            }
+            // 注销视图层
+            ApplicationView? viewApplication;
+            if(viewApplicationStaticMap_.TryGetValue(ApplicationView.NAME + "." + _gid, out viewApplication))
+            {
+                framework_.getStaticPipe().CancelView(viewApplication);
+                viewApplicationStaticMap_.Remove(ApplicationView.NAME + "." +_gid);
+            }
+            // 注销UI装饰层
+            ApplicationFacade? facadeApplication;
+            if(facadeApplicationStaticMap_.TryGetValue(ApplicationFacade.NAME + "." + _gid, out facadeApplication))
+            {
+                framework_.getStaticPipe().CancelFacade(facadeApplication);
+                facadeApplicationStaticMap_.Remove(ApplicationFacade.NAME + "." +_gid);
+            }
+            // 注销数据层
+            ApplicationModel? modelApplication;
+            if(modelApplicationStaticMap_.TryGetValue(ApplicationModel.NAME + "." + _gid, out modelApplication))
+            {
+                framework_.getStaticPipe().CancelModel(modelApplication);
+                modelApplicationStaticMap_.Remove(ApplicationModel.NAME + "." +_gid);
             }
 
             // 注销服务层
@@ -688,6 +812,42 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
             {
                 framework_.getDynamicPipe().PopModel(modelAgent);
                 modelAgentDynamicMap_.Remove(AgentModel.NAME + "." +_gid);
+            }
+
+            // 注销服务层
+            ApplicationService? serviceApplication;
+            if(serviceApplicationDynamicMap_.TryGetValue(ApplicationService.NAME + "." + _gid, out serviceApplication))
+            {
+                framework_.getDynamicPipe().PopService(serviceApplication);
+                serviceApplicationDynamicMap_.Remove(ApplicationService.NAME + "." +_gid);
+            }
+            // 注销控制层
+            ApplicationController? controllerApplication;
+            if(controllerApplicationDynamicMap_.TryGetValue(ApplicationController.NAME + "." + _gid, out controllerApplication))
+            {
+                framework_.getDynamicPipe().PopController(controllerApplication);
+                controllerApplicationDynamicMap_.Remove(ApplicationController.NAME + "." +_gid);
+            }
+            // 注销视图层
+            ApplicationView? viewApplication;
+            if(viewApplicationDynamicMap_.TryGetValue(ApplicationView.NAME + "." + _gid, out viewApplication))
+            {
+                framework_.getDynamicPipe().PopView(viewApplication);
+                viewApplicationDynamicMap_.Remove(ApplicationView.NAME + "." +_gid);
+            }
+            // 注销UI装饰层
+            ApplicationFacade? facadeApplication;
+            if(facadeApplicationDynamicMap_.TryGetValue(ApplicationFacade.NAME + "." + _gid, out facadeApplication))
+            {
+                framework_.getDynamicPipe().PopFacade(facadeApplication);
+                facadeApplicationDynamicMap_.Remove(ApplicationFacade.NAME + "." +_gid);
+            }
+            // 注销数据层
+            ApplicationModel? modelApplication;
+            if(modelApplicationDynamicMap_.TryGetValue(ApplicationModel.NAME + "." + _gid, out modelApplication))
+            {
+                framework_.getDynamicPipe().PopModel(modelApplication);
+                modelApplicationDynamicMap_.Remove(ApplicationModel.NAME + "." +_gid);
             }
 
             // 注销服务层

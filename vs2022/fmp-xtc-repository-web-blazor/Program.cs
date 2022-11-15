@@ -27,6 +27,11 @@ public partial class Program
         permissioS[Permissions.AgentRetrieve] = "";
         permissioS[Permissions.AgentDelete] = "";
 
+        permissioS[Permissions.ApplicationCreate] = "";
+        permissioS[Permissions.ApplicationUpdate] = "";
+        permissioS[Permissions.ApplicationRetrieve] = "";
+        permissioS[Permissions.ApplicationDelete] = "";
+
         permissioS[Permissions.HealthyCreate] = "";
         permissioS[Permissions.HealthyUpdate] = "";
         permissioS[Permissions.HealthyRetrieve] = "";

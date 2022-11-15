@@ -24,5 +24,10 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         public const string PluginRetrieve = "/XTC/Repository/Plugin/Retrieve";
         public const string PluginDelete = "/XTC/Repository/Plugin/Delete";
 
+        public const string ApplicationCreate = "/XTC/Repository/Application/Create";
+        public const string ApplicationUpdate = "/XTC/Repository/Application/Update";
+        public const string ApplicationRetrieve = "/XTC/Repository/Application/Retrieve";
+        public const string ApplicationDelete = "/XTC/Repository/Application/Delete";
+
     }
 }

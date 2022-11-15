@@ -14,6 +14,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
         private AgentDAO daoAgent_;
         private ModuleDAO daoModule_;
         private PluginDAO daoPlugin_;
+        private ApplicationDAO daoApplication_;
         private MinIOClient clientMinIO_;
 
 
@@ -31,6 +32,7 @@ namespace XTC.FMP.MOD.Repository.App.Service
             daoAgent_ = new AgentDAO(mongoDatabase_);
             daoModule_ = new ModuleDAO(mongoDatabase_);
             daoPlugin_ = new PluginDAO(mongoDatabase_);
+            daoApplication_ = new ApplicationDAO(mongoDatabase_);
             clientMinIO_ = new MinIOClient(_minioSettings);
         }
 
@@ -48,6 +50,12 @@ namespace XTC.FMP.MOD.Repository.App.Service
         {
             return daoPlugin_;
         }
+
+        public ApplicationDAO getApplicationDAO()
+        {
+            return daoApplication_;
+        }
+
 
         public MinIOClient getMinioClient()
         {
