@@ -3,7 +3,6 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
 {
     public class Permissions
     {
-
         public const string AgentCreate = "/XTC/Repository/Agent/Create";
         public const string AgentUpdate = "/XTC/Repository/Agent/Update";
         public const string AgentRetrieve = "/XTC/Repository/Agent/Retrieve";
@@ -28,6 +27,5 @@ namespace XTC.FMP.MOD.Repository.LIB.MVCS
         public const string ApplicationUpdate = "/XTC/Repository/Application/Update";
         public const string ApplicationRetrieve = "/XTC/Repository/Application/Retrieve";
         public const string ApplicationDelete = "/XTC/Repository/Application/Delete";
-
     }
 }

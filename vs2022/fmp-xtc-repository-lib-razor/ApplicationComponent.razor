@@ -35,7 +35,7 @@
 
 <Card Style="margin-top:24px">
     <div style="display:flex; margin-bottom:24px;">
-        @if (permissionS_.ContainsKey(Permissions.AgentCreate))
+        @if (permissionS_.ContainsKey(Permissions.ApplicationCreate))
         {
             <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Plus" OnClick="@onCreateClick">创建</Button>
         }
@@ -53,7 +53,7 @@
         </ActionColumn>
         <ActionColumn Title="操作" Fixed="right" Width="150">
             <Space Size=@("middle")>
-                @if (permissionS_.ContainsKey(Permissions.AgentUpdate))
+                @if (permissionS_.ContainsKey(Permissions.ApplicationUpdate))
                 {
                     <SpaceItem>
                         <Popconfirm Title="确定要解锁这个服务吗?"
@@ -71,7 +71,7 @@
                         <Button Size="small" Type="@ButtonType.Primary" OnClick="()=>onDownloadClick(context.Uuid)">下载</Button>
                     </SpaceItem>
                 }
-                @if (permissionS_.ContainsKey(Permissions.AgentDelete))
+                @if (permissionS_.ContainsKey(Permissions.ApplicationDelete))
                 {
                     <SpaceItem>
                         <Popconfirm Title="确定要删除这个服务吗?"
