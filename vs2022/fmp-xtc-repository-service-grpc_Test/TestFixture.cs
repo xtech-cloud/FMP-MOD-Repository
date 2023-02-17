@@ -23,6 +23,11 @@ public class TestFixture : TestFixtureBase
         serviceAgent_ = new AgentService(singletonServices_);
     }
 
+    protected override void newApplicationService()
+    {
+        throw new NotImplementedException();
+    }
+
     protected override void newHealthyService()
     {
         serviceHealthy_ = new HealthyService();
