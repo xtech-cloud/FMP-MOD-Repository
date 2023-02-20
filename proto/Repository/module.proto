@@ -1,6 +1,7 @@
 
 syntax = "proto3";
 import "shared.proto";
+import "google/api/annotations.proto";
 
 option csharp_namespace = "XTC.FMP.MOD.Repository.LIB.Proto";
 package xtc.fmp.repository;
@@ -8,25 +9,75 @@ package xtc.fmp.repository;
 // 插件
 service Module {
     // 创建
-    rpc Create(ModuleCreateRequest) returns (UuidResponse) {}
+    rpc Create(ModuleCreateRequest) returns (UuidResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/create",
+            body: "*",
+        };
+    }
     // 更新
-    rpc Update(ModuleUpdateRequest) returns (UuidResponse) {}
+    rpc Update(ModuleUpdateRequest) returns (UuidResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/update",
+            body: "*",
+        };
+    }
     // 读取
-    rpc Retrieve(UuidRequest) returns (ModuleRetrieveResponse) {}
+    rpc Retrieve(UuidRequest) returns (ModuleRetrieveResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/retrieve",
+            body: "*",
+        };
+    }
     // 删除
-    rpc Delete(UuidRequest) returns (UuidResponse) {}
+    rpc Delete(UuidRequest) returns (UuidResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/delete",
+            body: "*",
+        };
+    }
     // 列举
-    rpc List(ModuleListRequest) returns (ModuleListResponse) {}
+    rpc List(ModuleListRequest) returns (ModuleListResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/list",
+            body: "*",
+        };
+    }
     // 搜索
-    rpc Search(ModuleSearchRequest) returns (ModuleListResponse) {}
+    rpc Search(ModuleSearchRequest) returns (ModuleListResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/search",
+            body: "*",
+        };
+    }
     // 准备上传
-    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {}
+    rpc PrepareUpload(UuidRequest) returns (PrepareUploadResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/prepareupload",
+            body: "*",
+        };
+    }
     // 完成上传
-    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {}
+    rpc FlushUpload(UuidRequest) returns (FlushUploadResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/flushupload",
+            body: "*",
+        };
+    }
     // 添加标志
-    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+    rpc AddFlag(FlagOperationRequest) returns (FlagOperationResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/addflag",
+            body: "*",
+        };
+    }
     // 移除标志
-    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {}
+    rpc RemoveFlag(FlagOperationRequest) returns (FlagOperationResponse) {
+        option (google.api.http) = {
+            post: "/v1/xtc/repository/module/removeflag",
+            body: "*",
+        };
+    }
 }
 
 // 创建的请求
